@@ -118,7 +118,7 @@ function getBtnValue(value: any) {
 
       outputDisplay.textContent = inputJoin;
       if (value === "=") {
-        inputHistory.textContent = inputJoin;
+        inputHistory.textContent = inputJoin.split("").join(" ");
       }
       const data = parseInt(value, 10);
       dataValid = data;
