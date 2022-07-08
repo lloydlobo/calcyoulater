@@ -18,6 +18,14 @@
   font-family: var(--font-mono-noto);
 }
 
+#feed > * {
+  @apply flex text-xs;
+}
+
+#feed > * > * {
+  @apply text-indigo-400;
+}
+
 .keypads {
   grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
 }
