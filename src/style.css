@@ -6,8 +6,14 @@
   --font-sans-noto: "Noto Sans", sans-serif;
   --font-sans-yantra: "Yantramanav", sans-serif;
   --font-mono-noto: "Noto Sans Mono", monospace;
+  --vanta-brightness: 0.8;
+  --vanta-grayscale: 0.328;
+  --vanta-blur: 2px;
 }
-
+html {
+  overflow-x: hidden;
+  min-height: 100vh;
+}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -72,6 +78,15 @@ h3 {
 
 .logo {
   font-family: var(--font-sans-yantra);
+}
+
+.vanta-canvas {
+  height: 100% !important;
+  object-fit: cover;
+  width: 100vw;
+  overflow: hidden;
+  filter: blur(var(--vanta-blur)) brightness(var(--vanta-brightness))
+    grayscale(var(--vanta-grayscale));
 }
 
 header {
