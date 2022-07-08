@@ -24,10 +24,29 @@ console.dir(allBtn);
 
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
-    console.log(btn.value);
+    const value = btn.value;
+
+    getBtnValue(value);
   });
 });
 
+function getBtnValue(value: any) {
+  let counterNum = 0; // for no. of clicks and keystrokes
+  let counterNaN = 0;
+
+  if (value) {
+    if (isNaN(value)) {
+      outputDisplay.innerHTML = "NaN";
+      counterNaN += 1;
+      return NaN;
+    } else {
+      const data = parseInt(value, 10);
+      outputDisplay.textContent = data.toString();
+      counterNum += 1;
+    }
+  }
+  // throw new Error("Function not implemented.");
+}
 //
 //
 //
