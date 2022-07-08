@@ -8,7 +8,7 @@
   --font-mono-noto: "Noto Sans Mono", monospace;
   --vanta-brightness: 0.8;
   --vanta-grayscale: 0.328;
-  --vanta-blur: 2px;
+  --vanta-blur: 0px;
 }
 html {
   overflow-x: hidden;
@@ -66,6 +66,7 @@ body {
   min-height: 100vh;
   color: white;
   background-color: #e8e7ec;
+  backdrop-filter: blur(3.28px);
 }
 p {
   font-family: var(--font-sans-noto);

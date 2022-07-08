@@ -67,6 +67,7 @@ fetch(url)
 // CONSTANTS
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
 const btnAll = document.getElementsByTagName("button") as any;
+const inputHistory = document.querySelector("#inputHistory") as any;
 
 const allButtons = [...btnAll];
 
@@ -116,7 +117,9 @@ function getBtnValue(value: any) {
       console.log({ validNum }, { validOperator }); // {validNum: '15933'}validNum: "15933"[[Prototype]]: Object {validOperator: '1 + 5 - 9 +'}
 
       outputDisplay.textContent = inputJoin;
-
+      if (value === "=") {
+        inputHistory.textContent = inputJoin;
+      }
       const data = parseInt(value, 10);
       dataValid = data;
       dataValidArray.push(dataValid);
