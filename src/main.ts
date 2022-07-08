@@ -1,5 +1,9 @@
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
 import "./style.css";
+// IMPORTS DEPENDENCIES
+// import axios from "axios";
+// import express from "express";
+// let appExpress = express();
 
 // /////////////////////////APP//////////////////////////////////////////////
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -9,6 +13,21 @@ console.log(app);
 const appClass = app.className;
 appClass.toLowerCase();
 // //////////////////////////////////////////////////////////////////////////
+
+const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
+
+let url = "https://crytpoku.herokuapp.com/crypto";
+// let url = "http://localhost:8000/crypto";
+// url = `https://jsonplaceholder.typicode.com/posts`;
+// Add CORS Package in your backend server directory
+fetch(url)
+  .then((response) => response.json())
+  .then((data) => console.log(data));
+// app.get("https://crytpoku.herokuapp.com/crypto", (req, res) => {
+//   console.log(req);
+//   const data = res.json();
+//   console.log(data);
+// });
 
 // CONSTANTS
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
@@ -117,3 +136,7 @@ function main() {
 }
 
 main();
+
+// ////////////////////////////////////////////////////////////
+
+// CRYPTO LIVE
