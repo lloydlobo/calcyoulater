@@ -29,7 +29,6 @@ fetch(url)
     data.result.forEach((entry: any, index: number) => {
       // console.log(entry);
       if (index < 10) {
-        const title = `<h3 class="title">${entry.Coin}</h3>`;
         const articleItem = `
           <div>
             <h3 id="coinTitle" class="title">
