@@ -9,25 +9,35 @@ import "./style.css";
 const app = document.querySelector<HTMLDivElement>("#app")!;
 // app.innerHTML = ` //   <h1>Hello Vite!</h1> //   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a> // `;
 
-console.log(app);
+// console.log(app);
 const appClass = app.className;
 appClass.toLowerCase();
 // //////////////////////////////////////////////////////////////////////////
 
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
 
-let url = "https://crytpoku.herokuapp.com/crypto";
-// let url = "http://localhost:8000/crypto";
-// url = `https://jsonplaceholder.typicode.com/posts`;
+// let url = "https://crytpoku.herokuapp.com/crypto";
+let url = "http://localhost:8000/crypto";
+
+// https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87
 // Add CORS Package in your backend server directory
 fetch(url)
-  .then((response) => response.json())
-  .then((data) => console.log(data));
-// app.get("https://crytpoku.herokuapp.com/crypto", (req, res) => {
-//   console.log(req);
-//   const data = res.json();
-//   console.log(data);
-// });
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+    data.result.forEach((entry: any, index: number) => {
+      if (index < 10) {
+        console.log(entry);
+        const title = `<h3>${entry.Coin}</h3>`;
+        const articleItem = `<div><h3><a href="https://www.google.com/search?q=${entry.Coin}">${entry.Coin}</a></h3></div>`;
+        feedDisplay.insertAdjacentHTML("beforeend", articleItem);
+      } else {
+        return;
+      }
+    });
+  })
+  .catch((err) => console.error(err));
 
 // CONSTANTS
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
