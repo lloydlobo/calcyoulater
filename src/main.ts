@@ -26,7 +26,8 @@ console.dir(allBtn);
 let dataValidArray: number[] = [];
 let inputArray: string[] = [];
 let inputRegexArray: string[] = [];
-
+let validNum: string;
+let validOperator: string;
 function getBtnValue(value: any) {
   let counterNum = 0; // for no. of clicks and keystrokes
   let counterNaN = 0;
@@ -41,17 +42,23 @@ function getBtnValue(value: any) {
   let re = new RegExp(/ab+c/, 'i') // constructor with regular expression literal as first argument (Starting with ECMAScript 6)*/
 
   const regExpNumAndOperator = /[+-]?(\d*\.\d+|\d+\.\d*|\d+)/gm; // gm -> global & multiline
+  const regExpNumOnly = /[0-8]/gm;
   if (value) {
     if (typeof value === "string") {
       inputArray.push(value);
-
       const inputJoin = inputArray.join("");
       inputRegexArray.push(value);
 
-      let newStr = inputRegexArray
-        .join(" ")
-        .replace(regExpNumAndOperator, `$1`);
-      console.log(newStr);
+      if (value.match(regExpNumOnly)) {
+        console.log("num only", value);
+        validNum = inputRegexArray.join("").replace(regExpNumAndOperator, `$1`);
+      } else {
+        validOperator = inputRegexArray
+          .join(" ")
+          .replace(regExpNumAndOperator, `$1`); // FIXME filter out only operators
+      }
+
+      console.log({ validNum }, { validOperator }); // {validNum: '15933'}validNum: "15933"[[Prototype]]: Object {validOperator: '1 + 5 - 9 +'}
 
       outputDisplay.textContent = inputJoin;
 
