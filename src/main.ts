@@ -16,8 +16,8 @@ appClass.toLowerCase();
 
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
 
-// let url = "https://crytpoku.herokuapp.com/crypto";
-let url = "http://localhost:8000/crypto";
+let url = "https://crytpoku.herokuapp.com/crypto";
+// let url = "http://localhost:8000/crypto";
 
 // https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87
 // Add CORS Package in your backend server directory
@@ -27,10 +27,36 @@ fetch(url)
   })
   .then((data) => {
     data.result.forEach((entry: any, index: number) => {
+      // console.log(entry);
       if (index < 10) {
-        console.log(entry);
-        const title = `<h3>${entry.Coin}</h3>`;
-        const articleItem = `<div><h3><a href="https://www.google.com/search?q=${entry.Coin}">${entry.Coin}</a></h3></div>`;
+        const title = `<h3 class="title">${entry.Coin}</h3>`;
+        const articleItem = `
+          <div>
+            <h3 id="coinTitle" class="title">
+              <a href="https://www.google.com/search?q=${entry.Coin}">
+                ${entry.Coin}
+              </a>
+            </h3>
+            <div class="price">
+              <button id="btnFetchPrice" class="m-0 px-2 py-1">${entry.Price}</button>
+            </div>
+            <div class="market-cap">
+              <button id="btnFetchMarketCap" class="m-0 px-2 py-1">
+                ${entry.Marketcap}
+              </button>
+            </div>
+            <div class="day-7">
+              <button id="btnFetch7Days" class="m-0 px-2 py-1">
+                ${entry.Days_7}
+              </button>
+            </div>
+            <div class="hours-7">
+              <button id="btnFetch24Hours" class="m-0 px-2 py-1">
+                ${entry.Hours_24}
+              </button>
+            </div>
+          </div>
+        `;
         feedDisplay.insertAdjacentHTML("beforeend", articleItem);
       } else {
         return;
@@ -64,7 +90,7 @@ function getBtnValue(value: any) {
   let dataValid;
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-  /* 
+  /*
   // Before regular expressions can be used, they have to be compiled. This process allows them to perform matches more efficiently.
   let re = /ab+c/i; // literal notation
   let re = new RegExp('ab+c', 'i') // constructor with string pattern as first argument

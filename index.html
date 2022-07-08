@@ -100,19 +100,26 @@
           <button id="btndecimal" value=".">.</button>
           <button id="btnResultEquals" value="=">=</button>
         </div>
-
+        <!-- CANVAS -->
         <div
-          class="visualizer-wrapper place-content my-2 mx-6 grid aspect-video h-auto object-cover shadow-inner"
+          class="visualizer-wrapper place-content my-2 mx-6 h-min shadow-inner"
         >
           <canvas
             id="visualizer"
-            class="h-full w-full rounded bg-slate-700"
+            class="h-40 w-full rounded bg-slate-700 object-cover"
           ></canvas>
         </div>
-
+        <!-- FEED API FETCH -->
         <div class="crypto-results mx-6">
-          <h2 id="crypto" class="text-xl">Crypto Live Feed</h2>
-          <div id="feed" class="cypto-feed-list grid"></div>
+          <h2 id="crypto" class="my-2 text-neutral-400">Crypto Live Feed</h2>
+          <div class="mb-2 grid grid-cols-5 text-xs">
+            <div class="heading-title">Coin</div>
+            <div class="heading-price">Price</div>
+            <div class="heading-market-cap">Market Cap</div>
+            <div class="heading-day-7">7 Days%</div>
+            <div class="heading-hours-7">24h%</div>
+          </div>
+          <div id="feed" class="cypto-feed-list grid gap-1"></div>
         </div>
       </div>
     </main>
@@ -123,7 +130,7 @@
           <span class="copyright">&copy;</span>
           <span id="year" class="year"></span>
         </p>
-        <p class="author tracking-tight">
+        <p class="author tracking-wider">
           Made with <span class="text-rose-500">♥</span> by
           <a href="https://github.com/lloydlobo/" class="author-link">Lloyd</a>
         </p>

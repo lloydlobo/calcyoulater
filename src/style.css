@@ -19,11 +19,12 @@
 }
 
 #feed > * {
-  @apply flex text-xs;
+  @apply grid text-xs;
+  grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
 }
 
 #feed > * > * {
-  @apply text-indigo-400;
+  @apply text-slate-400;
 }
 
 .keypads {
