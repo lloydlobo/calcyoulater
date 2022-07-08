@@ -86,6 +86,7 @@ function getBtnValue(value: any) {
   let counterNum = 0; // for no. of clicks and keystrokes
   let counterNaN = 0;
 
+  console.log(counterNum, counterNaN);
   let dataValid;
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
@@ -137,7 +138,7 @@ allBtn.forEach((btn) => {
     const value = btn.value;
 
     const validDataNumbers = getBtnValue(value);
-    // console.log(validDataNumbers);
+    console.log(validDataNumbers);
   });
 });
 
