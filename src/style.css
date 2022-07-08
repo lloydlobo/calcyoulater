@@ -71,7 +71,7 @@ header {
   /* grid-row: auto; */
   /* outline: 1px solid hsla(266, 100%, 51%, 0.328); */
 
-  background: rgb(24, 34, 59);
+  background: hsl(223, 42%, 16%);
   /* background: linear-gradient(
     180deg,
     rgba(24, 34, 59, 1) 3%,
@@ -86,7 +86,7 @@ main {
   background: linear-gradient(
     344deg,
     rgba(24, 34, 59, 1) 31%,
-    rgba(51, 58, 87, 1) 66%,
+    #333a57 66%,
     /* rgba(98, 103, 130, 1) 200% */
   );
   /* grid-column: 4 / 10; */

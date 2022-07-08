@@ -17,7 +17,7 @@
     <header class="header mt-8 flex items-center rounded-t-3xl px-8 py-8">
       <nav class="navbar navbar-main flex w-full items-center justify-between">
         <div
-          class="logo mr-auto text-sm font-bold uppercase leading-none sm:text-xl"
+          class="logo mr-auto text-sm font-bold uppercase leading-none tracking-wider sm:text-xl"
         >
           calcyoulater
         </div>
@@ -47,33 +47,67 @@
         <div
           class="display mx-4 mb-4 items-baseline rounded bg-[#d1e4e4] py-1 px-4 text-end text-neutral-900"
         >
+          <div class="history-nav flex items-center justify-between">
+            <span
+              id="btnHistory"
+              class="history-button"
+              role="button"
+              aria-label="history of calculations"
+            >
+              <svg
+                class="h-6 w-6 leading-5"
+                focusable="false"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"
+                ></path>
+              </svg>
+            </span>
+            <div class="history-input-wrapper">
+              <div class="history-input">
+                <span id="inputHistory">Ans = 0</span>
+              </div>
+            </div>
+          </div>
           <output id="output" class="h-16 text-6xl font-bold">0</output>
         </div>
+
         <div class="keypads grid px-4 sm:px-4">
-          <button id="btnM">MC</button>
-          <button id="btnM">MR</button>
-          <button id="btnM">M-</button>
-          <button id="btnM">M+</button>
-          <button id="btnOperators">%</button>
-          <button id="btnPlusMinus">+/-</button>
-          <button id="btnNumbers">7</button>
-          <button id="btnNumbers">8</button>
-          <button id="btnNumbers">9</button>
-          <button id="btnOperators">*</button>
-          <button id="btnClear">C</button>
-          <button id="btnNumbers">4</button>
-          <button id="btnNumbers">5</button>
-          <button id="btnNumbers">6</button>
-          <button id="btnOperators">-</button>
-          <button id="btnAllClear">AC</button>
-          <button id="btnNumbers">1</button>
-          <button id="btnNumbers">2</button>
-          <button id="btnNumbers">3</button>
-          <button id="btnOperators" class="btn-plus">+</button>
-          <button id="btnNumbers">0</button>
-          <button id="btnNumbers">00</button>
-          <button id="btndecimal">.</button>
-          <button id="btnResultEquals">=</button>
+          <button id="btnM" value="MC">MC</button>
+          <button id="btnM" value="MR">MR</button>
+          <button id="btnM" value="M-">M-</button>
+          <button id="btnM" value="M+">M+</button>
+          <button id="btnOperators" value="%">%</button>
+          <button id="btnPlusMinus" value="+/-">+/-</button>
+          <button id="btnNumbers" value="7">7</button>
+          <button id="btnNumbers" value="8">8</button>
+          <button id="btnNumbers" value="9">9</button>
+          <button id="btnOperators" value="*">*</button>
+          <button id="btnClear" value="C">C</button>
+          <button id="btnNumbers" value="4">4</button>
+          <button id="btnNumbers" value="5">5</button>
+          <button id="btnNumbers" value="6">6</button>
+          <button id="btnOperators" value="-">-</button>
+          <button id="btnAllClear" value="AC">AC</button>
+          <button id="btnNumbers" value="1">1</button>
+          <button id="btnNumbers" value="2">2</button>
+          <button id="btnNumbers" value="3">3</button>
+          <button id="btnOperators" class="btn-plus" value="+">+</button>
+          <button id="btnNumbers" value="0">0</button>
+          <button id="btnNumbers" value="00">00</button>
+          <button id="btndecimal" value=".">.</button>
+          <button id="btnResultEquals" value="=">=</button>
+        </div>
+
+        <div
+          class="visualizer-wrapper place-content mx-6 my-6 grid aspect-video h-auto object-cover shadow-inner"
+        >
+          <canvas
+            id="visualizer"
+            class="h-full w-full rounded bg-slate-700"
+          ></canvas>
         </div>
       </div>
     </main>
