@@ -1,25 +1,33 @@
-import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
 import "./style.css";
-// IMPORTS DEPENDENCIES
-// import axios from "axios";
-// import express from "express";
-// let appExpress = express();
+
+import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
+import { calculate } from "./logic/calculator";
 
 // /////////////////////////APP//////////////////////////////////////////////
-const app = document.querySelector<HTMLDivElement>("#app")!;
-// app.innerHTML = ` //   <h1>Hello Vite!</h1> //   <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a> // `;
 
-// console.log(app);
+const app = document.querySelector<HTMLDivElement>("#app")!;
 const appClass = app.className;
 appClass.toLowerCase();
-// //////////////////////////////////////////////////////////////////////////
+
+// ///////////////////////LOGIC//////////////////////////////////////////////
+
+let x = null;
+let y = null;
+let operator = "+";
+
+x = 3;
+y = 2;
+operator = "-";
+
+const resultCalculated = calculate(x, y, operator); // works!
+console.log("file: main.ts | line 18 | resultCalculated", resultCalculated);
+
+// ///////////////////////FETCH FEED FROM API////////////////////////////////
 
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
 
 let url = "https://crytpoku.herokuapp.com/crypto";
-// let url = "http://localhost:8000/crypto";
 
-// https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87
 // Add CORS Package in your backend server directory
 fetch(url)
   .then((response) => {
@@ -30,32 +38,32 @@ fetch(url)
       // console.log(entry);
       if (index < 10) {
         const articleItem = `
-          <div>
-            <h3 id="coinTitle" class="title">
+      <div>
+      <h3 id="coinTitle" class="title">
               <a href="https://www.google.com/search?q=${entry.Coin}">
                 ${entry.Coin}
-              </a>
-            </h3>
-            <div class="price">
-              <button id="btnFetchPrice" class="m-0 px-2 py-1">${entry.Price}</button>
-            </div>
-            <div class="market-cap">
-              <button id="btnFetchMarketCap" class="m-0 px-2 py-1">
+                </a>
+                </h3>
+                <div class="price">
+                <button id="btnFetchPrice" class="m-0 px-2 py-1">${entry.Price}</button>
+                </div>
+                <div class="market-cap">
+                <button id="btnFetchMarketCap" class="m-0 px-2 py-1">
                 ${entry.Marketcap}
-              </button>
-            </div>
-            <div class="day-7">
-              <button id="btnFetch7Days" class="m-0 px-2 py-1">
+                </button>
+                </div>
+                <div class="day-7">
+                <button id="btnFetch7Days" class="m-0 px-2 py-1">
                 ${entry.Days_7}
-              </button>
-            </div>
-            <div class="hours-7">
-              <button id="btnFetch24Hours" class="m-0 px-2 py-1">
+                </button>
+                </div>
+                <div class="hours-7">
+                <button id="btnFetch24Hours" class="m-0 px-2 py-1">
                 ${entry.Hours_24}
-              </button>
-            </div>
-          </div>
-        `;
+                </button>
+                </div>
+                </div>
+                `;
         feedDisplay.insertAdjacentHTML("beforeend", articleItem);
       } else {
         return;
@@ -64,25 +72,27 @@ fetch(url)
   })
   .catch((err) => console.error(err));
 
-// CONSTANTS
+// ////////////////CONSTANTS///////////////////////////////////
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
 const btnAll = document.getElementsByTagName("button") as any;
 const inputHistory = document.querySelector("#inputHistory") as any;
 
-const allButtons = [...btnAll];
-
+// MUTABLE VARIABLES
 let allBtn: HTMLButtonElement[] = [];
-
-allButtons.forEach((btn) => {
-  allBtn.push(btn);
-});
-
-console.dir(allBtn);
 let dataValidArray: number[] = [];
 let inputArray: string[] = [];
 let inputRegexArray: string[] = [];
 let validNum: string;
 let validOperator: string;
+
+// Spread btnAll to access forEach method
+const allButtons = [...btnAll];
+allButtons.forEach((btn) => {
+  allBtn.push(btn);
+});
+
+console.dir(allBtn);
+
 function getBtnValue(value: any) {
   let counterNum = 0; // for no. of clicks and keystrokes
   let counterNaN = 0;
@@ -91,11 +101,7 @@ function getBtnValue(value: any) {
   let dataValid;
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-  /*
-  // Before regular expressions can be used, they have to be compiled. This process allows them to perform matches more efficiently.
-  let re = /ab+c/i; // literal notation
-  let re = new RegExp('ab+c', 'i') // constructor with string pattern as first argument
-  let re = new RegExp(/ab+c/, 'i') // constructor with regular expression literal as first argument (Starting with ECMAScript 6)*/
+  /* // Before regular expressions can be used, they have to be compiled. This process allows them to perform matches more efficiently.  let re = /ab+c/i; // literal notation let re = new RegExp('ab+c', 'i') // constructor with string pattern as first argument let re = new RegExp(/ab+c/, 'i') // constructor with regular expression literal as first argument (Starting with ECMAScript 6)*/
 
   const regExpNumAndOperator = /[+-]?(\d*\.\d+|\d+\.\d*|\d+)/gm; // gm -> global & multiline
   const regExpNumOnly = /[0-8]/gm;
@@ -141,9 +147,38 @@ allBtn.forEach((btn) => {
     const value = btn.value;
 
     const validDataNumbers = getBtnValue(value);
+
     console.log(validDataNumbers);
+
+    if (btn.value === "=") {
+      outputDisplay.textContent = (5 + 5).toString();
+    }
+
+    if (btn.value === "C" || btn.value === "AC") {
+      clearDisplay();
+      clearCurrent();
+    }
+
+    if (btn.value === "MC") {
+      clearMemory();
+    }
   });
 });
+
+function clearDisplay() {
+  outputDisplay.innerHTML = "0";
+}
+
+function clearMemory() {
+  const inputHistoryMCArray = [];
+}
+
+function clearCurrent() {
+  inputArray = [];
+  inputRegexArray = [];
+  // inputHistory = []
+  // throw new Error("Function not implemented.");
+}
 
 //
 //
@@ -151,6 +186,8 @@ allBtn.forEach((btn) => {
 //
 //
 //
+
+// ////////////////CANVAS//////////////////////////////////////
 
 // GET TEXT From User Input in DOM Display
 const outputVal = outputDisplay.textContent;
@@ -169,6 +206,8 @@ const animateCanvas = (
   setInterval(fillBlankOnCanvas, blankTime);
 };
 
+// ////////////////MAIN////////////////////////////////////////
+
 // MAIN
 function main() {
   animateCanvas(1000, 1000);
@@ -176,6 +215,6 @@ function main() {
 
 main();
 
-// ////////////////////////////////////////////////////////////
+// ////////////////END/////////////////////////////////////////
 
-// CRYPTO LIVE
+// https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87
