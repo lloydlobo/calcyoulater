@@ -1,6 +1,62 @@
+/* cspell:disable yantra  */
+
+@import "tailwindcss/base";
+/* @import "./custom-base-styles.css"; */
+
+@import "tailwindcss/components";
+/* @import "./custom-components.css"; */
+
+@import "tailwindcss/utilities";
+/* @import "./custom-utilities.css"; */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* creating separate files for each \@tailwind declaration, and then importing those files in your main stylesheet.*/
+
+/* If you want to add some custom CSS that should always be included, add it to your stylesheet without using the @layer directive: */
+
+@layer base {
+  h1 {
+    @apply text-2xl;
+  }
+  h2 {
+    @apply text-lg;
+  }
+}
+@layer components {
+  button {
+    /* background-color: theme("colors.slate.900"); */
+    margin: theme(margin.2);
+    border-radius: theme(borderRadius.sm);
+    background-color: hsl(228, 26%, 27%);
+    /* @apply m-2 rounded; */
+
+    &:hover {
+      background-color: hsl(228, 26%, 37%);
+      box-shadow: theme(boxShadow.xl);
+      /* transform: theme(translate.3); */
+      transform: translate(0px, 1px);
+      transition-duration: theme(transitionDuration.100);
+      transition-timing-function: theme(transitionTimingFunction.in-out);
+    }
+  }
+  button.keypad {
+    padding-block: theme(padding.2);
+  }
+}
+@layer utilities {
+  /* Applies to all except first child. Put this on headings */
+  .flow > * + * {
+    margin-bottom: theme(margin.8);
+  }
+
+  .content-auto {
+    content-visibility: auto;
+  }
+}
+/* https://tailwindcss.com/docs/adding-custom-styles#adding-base-styles= */
 
 :root {
   --font-sans-noto: "Noto Sans", sans-serif;
@@ -14,6 +70,78 @@
 html {
   overflow-x: hidden;
   min-height: 100vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  /* background-color: hsla(64, 100%, 51%, 0.068); */
+}
+
+body {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-rows: auto 1fr auto;
+  width: min(100% - 2rem, 80vw);
+  margin-inline: auto;
+  min-height: 100vh;
+  font-family: var(--font-sans-noto);
+  color: white;
+  background-color: #e8e7ec;
+  backdrop-filter: blur(3.28px);
+}
+
+p {
+  font-family: var(--font-sans-noto);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-sans-yantra);
+}
+
+body::-webkit-scrollbar {
+  width: 1.25rem;
+}
+
+body::-webkit-scrollbar-track {
+  background: hsl(223, 42%, 16%);
+}
+
+/* Add a thumb */
+body::-webkit-scrollbar-thumb {
+  background-color: hsl(228 26% 27% / 0.618);
+}
+
+.logo {
+  font-family: var(--font-sans-yantra);
+}
+
+header {
+  grid-area: header;
+  background: hsl(223, 42%, 16%);
+}
+
+main {
+  grid-area: main;
+  background: hsl(223, 42%, 16%);
+}
+
+footer {
+  grid-area: footer;
+  background: hsl(223, 42%, 16%);
+  background: linear-gradient(
+    180deg,
+    hsl(223, 42%, 16%) 0%,
+    hsl(223, 42%, 16%) 102%
+  );
 }
 
 #app {
@@ -42,66 +170,6 @@ html {
   grid-row: span 2;
 }
 
-button {
-  background-color: rgba(51, 58, 87, 1);
-  @apply m-2 rounded;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  /* background-color: hsla(240, 100%, 50%, 0.0328); */
-}
-
-body {
-  font-family: var(--font-sans-noto);
-  display: grid;
-  grid-template-areas:
-    "header"
-    "main"
-    "footer";
-
-  grid-template-rows: auto 1fr auto;
-  width: min(100% - 2rem, 80vw);
-  margin-inline: auto;
-  min-height: 100vh;
-  color: white;
-  background-color: #e8e7ec;
-  backdrop-filter: blur(3.28px);
-}
-
-p {
-  font-family: var(--font-sans-noto);
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-sans-yantra);
-}
-
-/* https://developer.mozilla.org/en-US/docs/Web/CSS/::-webkit-scrollbar */
-/* Demonstrate a "mostly customized" scrollbar * (won't be visible otherwise if width/height is specified) */
-body::-webkit-scrollbar {
-  width: 1.25rem;
-}
-
-body::-webkit-scrollbar-track {
-  background: hsl(223, 42%, 16%);
-}
-
-/* Add a thumb */
-body::-webkit-scrollbar-thumb {
-  background-color: hsla(228, 26%, 27%, 0.618);
-}
-
-.logo {
-  font-family: var(--font-sans-yantra);
-}
-
 .vanta-canvas {
   height: 100% !important;
   object-fit: cover;
@@ -109,33 +177,4 @@ body::-webkit-scrollbar-thumb {
   overflow: hidden;
   filter: blur(var(--vanta-blur)) brightness(var(--vanta-brightness))
     grayscale(var(--vanta-grayscale));
-}
-
-header {
-  grid-area: header;
-  background: hsl(223, 42%, 16%);
-}
-
-main {
-  grid-area: main;
-  background: rgb(24, 34, 59);
-  background: linear-gradient(
-    344deg,
-    rgba(24, 34, 59, 1) 31%,
-    #333a57 66%,
-    /* rgba(98, 103, 130, 1) 200% */
-  );
-  /* grid-column: 4 / 10; */
-  /* grid-row: 2 / 12; */
-  /* outline: 1px solid hsla(266, 100%, 51%, 0.328); */
-}
-
-footer {
-  grid-area: footer;
-  background: hsl(223, 42%, 16%);
-  background: linear-gradient(
-    180deg,
-    hsl(223, 42%, 16%) 0%,
-    hsl(223, 42%, 16%) 102%
-  );
 }

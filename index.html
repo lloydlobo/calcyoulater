@@ -75,30 +75,30 @@
         </div>
 
         <div class="keypads grid px-4 sm:px-4">
-          <button id="btnM" value="MC">MC</button>
-          <button id="btnM" value="MR">MR</button>
-          <button id="btnM" value="M-">M-</button>
-          <button id="btnM" value="M+">M+</button>
-          <button id="btnOperators" value="/">%</button>
-          <button id="btnPlusMinus" value="+/-">+/-</button>
-          <button id="btnNumbers" value="7">7</button>
-          <button id="btnNumbers" value="8">8</button>
-          <button id="btnNumbers" value="9">9</button>
-          <button id="btnOperators" value="*">*</button>
-          <button id="btnClear" value="C">C</button>
-          <button id="btnNumbers" value="4">4</button>
-          <button id="btnNumbers" value="5">5</button>
-          <button id="btnNumbers" value="6">6</button>
-          <button id="btnOperators" value="-">-</button>
-          <button id="btnAllClear" value="AC">AC</button>
-          <button id="btnNumbers" value="1">1</button>
-          <button id="btnNumbers" value="2">2</button>
-          <button id="btnNumbers" value="3">3</button>
-          <button id="btnOperators" class="btn-plus" value="+">+</button>
-          <button id="btnNumbers" value="0">0</button>
-          <button id="btnNumbers" value="00">00</button>
-          <button id="btndecimal" value=".">.</button>
-          <button id="btnResultEquals" value="=">=</button>
+          <button class="keypad" id="btnM" value="MC">MC</button>
+          <button class="keypad" id="btnM" value="MR">MR</button>
+          <button class="keypad" id="btnM" value="M-">M-</button>
+          <button class="keypad" id="btnM" value="M+">M+</button>
+          <button class="keypad" id="btnOperators" value="/">%</button>
+          <button class="keypad" id="btnPlusMinus" value="+/-">+/-</button>
+          <button class="keypad" id="btnNumbers" value="7">7</button>
+          <button class="keypad" id="btnNumbers" value="8">8</button>
+          <button class="keypad" id="btnNumbers" value="9">9</button>
+          <button class="keypad" id="btnOperators" value="*">*</button>
+          <button class="keypad" id="btnClear" value="C">C</button>
+          <button class="keypad" id="btnNumbers" value="4">4</button>
+          <button class="keypad" id="btnNumbers" value="5">5</button>
+          <button class="keypad" id="btnNumbers" value="6">6</button>
+          <button class="keypad" id="btnOperators" value="-">-</button>
+          <button class="keypad" id="btnAllClear" value="AC">AC</button>
+          <button class="keypad" id="btnNumbers" value="1">1</button>
+          <button class="keypad" id="btnNumbers" value="2">2</button>
+          <button class="keypad" id="btnNumbers" value="3">3</button>
+          <button class="keypad btn-plus" id="btnOperators" value="+">+</button>
+          <button class="keypad" id="btnNumbers" value="0">0</button>
+          <button class="keypad" id="btnNumbers" value="00">00</button>
+          <button class="keypad" id="btndecimal" value=".">.</button>
+          <button class="keypad" id="btnResultEquals" value="=">=</button>
         </div>
         <!-- CANVAS -->
         <div
@@ -111,15 +111,17 @@
         </div>
         <!-- FEED API FETCH -->
         <div class="crypto-results mx-6">
-          <h2 id="crypto" class="my-2 text-neutral-400">Crypto Live Feed</h2>
+          <h2 id="crypto" class="flow bold my-2 uppercase text-neutral-300">
+            Crypto Live Feed
+          </h2>
           <div class="mb-2 grid grid-cols-5 text-xs">
             <div class="heading-title">Coin</div>
             <div class="heading-price">Price</div>
-            <div class="heading-market-cap">Market Cap</div>
-            <div class="heading-day-7">7 Days%</div>
+            <div class="heading-market-cap">Cap</div>
+            <div class="heading-day-7">7d%</div>
             <div class="heading-hours-7">24h%</div>
           </div>
-          <div id="feed" class="cypto-feed-list grid gap-1"></div>
+          <div id="feed" class="cypto-feed-list grid gap-y-2 gap-x-1"></div>
         </div>
       </div>
     </main>
