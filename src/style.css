@@ -1,17 +1,16 @@
 /* cspell:disable yantra  */
-
 @import "tailwindcss/base";
-/* @import "./custom-base-styles.css"; */
+@import "./styles/base.css";
 
 @import "tailwindcss/components";
-/* @import "./custom-components.css"; */
+@import "./styles/components.css";
 
 @import "tailwindcss/utilities";
-/* @import "./custom-utilities.css"; */
+@import "./styles/utilities.css";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* @tailwind base; */
+/* @tailwind components; */
+/* @tailwind utilities; */
 
 /* creating separate files for each \@tailwind declaration, and then importing those files in your main stylesheet.*/
 
@@ -52,129 +51,8 @@
     margin-bottom: theme(margin.8);
   }
 
-  .content-auto {
+  /* .content-auto {
     content-visibility: auto;
-  }
+  } */
 }
 /* https://tailwindcss.com/docs/adding-custom-styles#adding-base-styles= */
-
-:root {
-  --font-sans-noto: "Noto Sans", sans-serif;
-  --font-sans-yantra: "Yantramanav", sans-serif;
-  --font-mono-noto: "Noto Sans Mono", monospace;
-  --vanta-brightness: 0.8;
-  --vanta-grayscale: 0.328;
-  --vanta-blur: 0px;
-}
-
-html {
-  overflow-x: hidden;
-  min-height: 100vh;
-}
-
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-  /* background-color: hsla(64, 100%, 51%, 0.068); */
-}
-
-body {
-  display: grid;
-  grid-template-areas:
-    "header"
-    "main"
-    "footer";
-  grid-template-rows: auto 1fr auto;
-  width: min(100% - 2rem, 80vw);
-  margin-inline: auto;
-  min-height: 100vh;
-  font-family: var(--font-sans-noto);
-  color: white;
-  background-color: #e8e7ec;
-  backdrop-filter: blur(3.28px);
-}
-
-p {
-  font-family: var(--font-sans-noto);
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-sans-yantra);
-}
-
-body::-webkit-scrollbar {
-  width: 1.25rem;
-}
-
-body::-webkit-scrollbar-track {
-  background: hsl(223, 42%, 16%);
-}
-
-/* Add a thumb */
-body::-webkit-scrollbar-thumb {
-  background-color: hsl(228 26% 27% / 0.618);
-}
-
-.logo {
-  font-family: var(--font-sans-yantra);
-}
-
-header {
-  grid-area: header;
-  background: hsl(223, 42%, 16%);
-}
-
-main {
-  grid-area: main;
-  background: hsl(223, 42%, 16%);
-}
-
-footer {
-  grid-area: footer;
-  background: hsl(223, 42%, 16%);
-  background: linear-gradient(
-    180deg,
-    hsl(223, 42%, 16%) 0%,
-    hsl(223, 42%, 16%) 102%
-  );
-}
-
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-#output {
-  font-family: var(--font-mono-noto);
-}
-
-#feed > * {
-  @apply grid text-xs;
-  grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
-}
-
-#feed > * > * {
-  @apply text-slate-400;
-}
-
-.keypads {
-  grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
-}
-
-.btn-plus {
-  grid-row: span 2;
-}
-
-.vanta-canvas {
-  height: 100% !important;
-  object-fit: cover;
-  width: 100vw;
-  overflow: hidden;
-  filter: blur(var(--vanta-blur)) brightness(var(--vanta-brightness))
-    grayscale(var(--vanta-grayscale));
-}

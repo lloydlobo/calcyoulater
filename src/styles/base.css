@@ -1,0 +1,79 @@
+/* cspell:ignore vanta yantra */
+
+:root {
+  --font-sans-noto: "Noto Sans", sans-serif;
+  --font-sans-yantra: "Yantramanav", sans-serif;
+  --font-mono-noto: "Noto Sans Mono", monospace;
+  --vanta-brightness: 0.8;
+  --vanta-grayscale: 0.328;
+  --vanta-blur: 0px;
+}
+
+html {
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  /* background-color: hsla(64, 100%, 51%, 0.068); */
+}
+
+body {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-rows: auto 1fr auto;
+  width: min(100% - 2rem, 80vw);
+  margin-inline: auto;
+  min-height: 100vh;
+  font-family: var(--font-sans-noto);
+  color: white;
+  background-color: #e8e7ec;
+  backdrop-filter: blur(3.28px);
+}
+
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p {
+  font-family: var(--font-sans-noto);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-sans-yantra);
+}
+
+header {
+  grid-area: header;
+  background: hsl(223, 42%, 16%);
+}
+
+main {
+  grid-area: main;
+  background: hsl(223 42% 16% / 0.99);
+}
+
+footer {
+  grid-area: footer;
+  background: hsl(223, 42%, 16%);
+  background: linear-gradient(
+    180deg,
+    hsl(223, 42%, 16%) 0%,
+    hsl(223, 42%, 16%) 102%
+  );
+}
+
+.logo {
+  font-family: var(--font-sans-yantra);
+}

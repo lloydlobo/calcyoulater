@@ -1,0 +1,58 @@
+/* cspell:ignore vanta */
+
+/* **************************************************************** */
+/* SCROLLBAR */
+/* **************************************************************** */
+
+body::-webkit-scrollbar {
+  width: 1.25rem;
+}
+body::-webkit-scrollbar-track {
+  background: hsl(223, 42%, 16%);
+}
+/* Add a thumb */
+body::-webkit-scrollbar-thumb {
+  background-color: hsl(228 26% 27% / 0.618);
+}
+
+/* **************************************************************** */
+/* VANTA - HTML BACKGROUND ANIMATION THREE JS  */
+/* **************************************************************** */
+
+.vanta-canvas {
+  height: 100% !important;
+  object-fit: cover;
+  width: 100vw;
+  overflow: hidden;
+  filter: blur(var(--vanta-blur)) brightness(var(--vanta-brightness))
+    grayscale(var(--vanta-grayscale));
+}
+
+/* **************************************************************** */
+/* BITCOIN FEED */
+/* **************************************************************** */
+
+#feed > * {
+  @apply grid text-xs;
+  grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
+}
+
+#feed > * > * {
+  @apply text-slate-400;
+}
+
+/* **************************************************************** */
+/* CALCULATOR BUTTON KEYPADS */
+/* **************************************************************** */
+
+.keypads {
+  grid-template-columns: repeat(auto-fit, minmax(20%, 1fr));
+}
+
+.btn-plus {
+  grid-row: span 2;
+}
+
+#output {
+  font-family: var(--font-mono-noto);
+}
