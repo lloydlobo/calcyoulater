@@ -1,6 +1,9 @@
+/* eslint-disable consistent-return */
+/* eslint-disable import/prefer-default-export */
+
 // ////////////////POSSIBLE OPERATOR OBJECT ////////////////////////
 
-let operatorArith = [
+const operatorArith = [
   { name: "division", operator: "/" },
   { name: "multiplication", operator: "*" },
   { name: "addition", operator: "+" },
@@ -20,21 +23,23 @@ function isValid(
     x === null || x === undefined || y === null || y === undefined;
   const xOrYisInfinity = x === Infinity || y === Infinity;
   const xOrYIsInvalid = xOrYisNull || xOrYisInfinity;
-  if (xOrYIsInvalid || isNaN(x) || isNaN(y) || operatorIsInvalid) {
-    throw new Error("Invalid numbers or " + operatorInput + "");
+  if (
+    xOrYIsInvalid ||
+    (x as any).isNaN ||
+    (y as any).isNaN ||
+    operatorIsInvalid
+  ) {
+    throw new Error(`Invalid numbers or ${operatorInput}`);
   }
 
   const dividedByZero = y === 0 && operatorInput === "/";
   if (dividedByZero) {
-    console.error(
-      "Can't divide by zero or the universe may explode infinitely!"
-    );
     throw new Error(
       "Can't divide by zero. The universe may explode infinitely!"
     );
   }
   return new Error(
-    "Invalid numbers or " + operatorInput + " must be " + dividedByZero
+    `Invalid numbers or ${operatorInput} must be ${dividedByZero}`
   );
 }
 
@@ -55,7 +60,6 @@ function getCalculations(operatorUsed: string, x: number, y: number) {
       return [x - y, x, y, operatorUsed];
     }
     default: {
-      console.error("Invalid operator");
       throw new Error("Somewhere went wrong!");
     }
   }
@@ -85,10 +89,7 @@ export function calculate(
 // /////////////////////////DEBUG////////////////////////////////////////////
 
 // const result = calculate(2, 1, "/");
-
-// if (result) {
-//   console.log(result);
-// }
+// if (result) { //   console.log(result); // }
 // // calculate(2, 4, "+");
 
 // /////////////////////////END//////////////////////////////////////////////
@@ -96,8 +97,6 @@ export function calculate(
 // https://www.programiz.com/javascript/operators
 /* 
 Bracket Order Division Multiplication Addition Subtraction
-
-
 +	Addition	x + y
 -	Subtraction	x - y
 *	Multiplication	x * y

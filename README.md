@@ -1,4 +1,5 @@
 # calcyoulater
+
 A calculator app for The Odin Project
 
 ## References
@@ -14,3 +15,9 @@ A calculator app for The Odin Project
 > 4. Multiplication and division,
 >
 > 5. Addition and subtraction.
+
+### Development References
+
+#### ESLint & Prettier Configuration
+
+- [Add Eslint, Prettier, and Airbnb Style Guide to Your Project.](https://dev.to/saurabhggc/add-eslint-prettier-and-airbnb-to-your-project-3mo8)

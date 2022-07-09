@@ -1,3 +1,6 @@
+/* eslint-disable import/extensions */
+/* eslint-disable import/no-unresolved */
+/* eslint-disable no-console */
 import "./style.css";
 
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
@@ -26,13 +29,11 @@ console.log("file: main.ts | line 18 | resultCalculated", resultCalculated);
 
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
 
-let url = "https://crytpoku.herokuapp.com/crypto";
+const url = "https://crytpoku.herokuapp.com/crypto";
 
 // Add CORS Package in your backend server directory
 fetch(url)
-  .then((response) => {
-    return response.json();
-  })
+  .then((response) => response.json())
   .then((data) => {
     data.result.forEach((entry: any, index: number) => {
       // console.log(entry);
@@ -65,8 +66,6 @@ fetch(url)
                 </div>
                 `;
         feedDisplay.insertAdjacentHTML("beforeend", articleItem);
-      } else {
-        return;
       }
     });
   })
@@ -78,8 +77,8 @@ const btnAll = document.getElementsByTagName("button") as any;
 const inputHistory = document.querySelector("#inputHistory") as any;
 
 // MUTABLE VARIABLES
-let allBtn: HTMLButtonElement[] = [];
-let dataValidArray: number[] = [];
+const allBtn: HTMLButtonElement[] = [];
+const dataValidArray: number[] = [];
 let inputArray: string[] = [];
 let inputRegexArray: string[] = [];
 let validNum: string;
@@ -101,7 +100,7 @@ function getBtnValue(value: any) {
   let dataValid;
 
   // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-  /* // Before regular expressions can be used, they have to be compiled. This process allows them to perform matches more efficiently.  let re = /ab+c/i; // literal notation let re = new RegExp('ab+c', 'i') // constructor with string pattern as first argument let re = new RegExp(/ab+c/, 'i') // constructor with regular expression literal as first argument (Starting with ECMAScript 6)*/
+  /* // Before regular expressions can be used, they have to be compiled. This process allows them to perform matches more efficiently.  let re = /ab+c/i; // literal notation let re = new RegExp('ab+c', 'i') // constructor with string pattern as first argument let re = new RegExp(/ab+c/, 'i') // constructor with regular expression literal as first argument (Starting with ECMAScript 6) */
 
   const regExpNumAndOperator = /[+-]?(\d*\.\d+|\d+\.\d*|\d+)/gm; // gm -> global & multiline
   const regExpNumOnly = /[0-8]/gm;
@@ -132,7 +131,8 @@ function getBtnValue(value: any) {
 
       counterNum += 1;
       return dataValidArray;
-    } else if (isNaN(value)) {
+    }
+    if ((value as any).isNaN) {
       outputDisplay.innerHTML = "NaN";
       counterNaN += 1;
       return NaN;
@@ -142,9 +142,25 @@ function getBtnValue(value: any) {
   // throw new Error("Function not implemented.");
 }
 
+function clearDisplay() {
+  outputDisplay.innerHTML = "0";
+}
+
+function clearMemory() {
+  const inputHistoryMCArray: any[] = [];
+  console.log(inputHistoryMCArray);
+}
+
+function clearCurrent() {
+  inputArray = [];
+  inputRegexArray = [];
+  // inputHistory = []
+  // throw new Error("Function not implemented.");
+}
+
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
-    const value = btn.value;
+    const { value } = btn;
 
     const validDataNumbers = getBtnValue(value);
 
@@ -165,34 +181,12 @@ allBtn.forEach((btn) => {
   });
 });
 
-function clearDisplay() {
-  outputDisplay.innerHTML = "0";
-}
-
-function clearMemory() {
-  const inputHistoryMCArray: any[] = [];
-  console.log(inputHistoryMCArray);
-}
-
-function clearCurrent() {
-  inputArray = [];
-  inputRegexArray = [];
-  // inputHistory = []
-  // throw new Error("Function not implemented.");
-}
-
-//
-//
-//
-//
-//
-//
-
 // ////////////////CANVAS//////////////////////////////////////
 
 // GET TEXT From User Input in DOM Display
 const outputVal = outputDisplay.textContent;
 
+// eslint-disable-next-line import/prefer-default-export, import/no-mutable-exports
 export let output: number;
 if (outputVal) {
   output = parseInt(outputVal, 10);
