@@ -170,7 +170,8 @@ function clearDisplay() {
 }
 
 function clearMemory() {
-  const inputHistoryMCArray = [];
+  const inputHistoryMCArray: any[] = [];
+  console.log(inputHistoryMCArray);
 }
 
 function clearCurrent() {

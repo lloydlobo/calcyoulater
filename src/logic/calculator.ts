@@ -1,4 +1,4 @@
-// import chalk from "chalk";
+// ////////////////POSSIBLE OPERATOR OBJECT ////////////////////////
 
 let operatorArith = [
   { name: "division", operator: "/" },
@@ -7,25 +7,7 @@ let operatorArith = [
   { name: "subtraction", operator: "-" },
 ];
 
-export function calculate(
-  x: number | null | undefined,
-  y: number | null | undefined,
-  operatorInput: string | null | undefined
-):
-  | (number | "/")[]
-  | (number | "*")[]
-  | (number | "+")[]
-  | (number | "-")[]
-  | undefined {
-  const isError = isValid(operatorInput, x, y);
-
-  if (!isError) return;
-
-  const operatorUsed = operatorArith.filter(
-    (o) => o.operator === operatorInput
-  )[0].operator;
-  return getCalculations(operatorUsed, x!, y!);
-}
+// ///////////INPUT NUMBERS & OPERATORS VALIDITY CHECKER////////////
 
 function isValid(
   operatorInput: string | null | undefined,
@@ -56,12 +38,7 @@ function isValid(
   );
 }
 
-const result = calculate(2, 1, "/");
-
-if (result) {
-  console.log(result);
-}
-// calculate(2, 4, "+");
+// /////////////////////////GET CALCULATIONS/////////////////////////////////
 
 function getCalculations(operatorUsed: string, x: number, y: number) {
   switch (operatorUsed) {
@@ -83,6 +60,38 @@ function getCalculations(operatorUsed: string, x: number, y: number) {
     }
   }
 }
+// /////////////////////////CALCULATE MAIN FN////////////////////////////////
+
+export function calculate(
+  x: number | null | undefined,
+  y: number | null | undefined,
+  operatorInput: string | null | undefined
+):
+  | (number | "/")[]
+  | (number | "*")[]
+  | (number | "+")[]
+  | (number | "-")[]
+  | undefined {
+  const isError = isValid(operatorInput, x, y);
+  if (!isError) return;
+
+  const operatorUsed = operatorArith.filter(
+    (o) => o.operator === operatorInput
+  )[0].operator;
+
+  return getCalculations(operatorUsed, x!, y!);
+}
+
+// /////////////////////////DEBUG////////////////////////////////////////////
+
+// const result = calculate(2, 1, "/");
+
+// if (result) {
+//   console.log(result);
+// }
+// // calculate(2, 4, "+");
+
+// /////////////////////////END//////////////////////////////////////////////
 
 // https://www.programiz.com/javascript/operators
 /* 
