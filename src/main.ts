@@ -33,12 +33,6 @@ const resultCalculated = calculate(x, y, operator); // works!
 console.log("file: main.ts | line 18 | resultCalculated", resultCalculated);
 
 // ///////////////////////CHARTS D3//////////////////////////////////////////
-// let DUMMY_DATA = [
-//   { id: "1", value: 10, region: "USA" },
-//   { id: "2", value: 14, region: "UK" },
-//   { id: "3", value: 8, region: "India" },
-//   { id: "4", value: 5, region: "China" },
-// ];
 
 const d3Article = document.getElementById("d3");
 if (!d3Article) throw new Error("d3 not found");
@@ -75,6 +69,7 @@ async function drawChart(DUMMY_DATA: any[]) {
 }
 
 // ///////////////////////FETCH FEED FROM API////////////////////////////////
+
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
 const url = "https://crytpoku.herokuapp.com/crypto";
 // Add CORS Package in your backend server directory
@@ -128,13 +123,12 @@ const dataFetch = fetch(url)
   .catch((err) => console.error(err));
 
 (async () => {
-  // console.log(await d3Array[0]);
+  // use this to wait till the data is fetched
   await dataFetch;
-  console.log(d3Array);
-  await drawChart(d3Array);
-  // console.log(dataFetch.then((result) => result));
+  // and then draw d3 chart when d3Array is populated in the stack/heap?
+  // FIXME
+  await drawChart(d3Array); // uses a global variable
 })();
-// console.dir(d3Array);
 
 // ////////////////CONSTANTS///////////////////////////////////
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
