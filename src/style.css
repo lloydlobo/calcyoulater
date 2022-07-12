@@ -8,12 +8,8 @@
 @import "tailwindcss/utilities";
 @import "./styles/utilities.css";
 
-/* @tailwind base; */
-/* @tailwind components; */
-/* @tailwind utilities; */
-
+/* @tailwind base; */ /* @tailwind components; */ /* @tailwind utilities; */
 /* creating separate files for each \@tailwind declaration, and then importing those files in your main stylesheet.*/
-
 /* If you want to add some custom CSS that should always be included, add it to your stylesheet without using the @layer directive: */
 
 @layer base {
@@ -50,9 +46,5 @@
   .flow > * + * {
     margin-bottom: theme(margin.8);
   }
-
-  /* .content-auto {
-    content-visibility: auto;
-  } */
 }
 /* https://tailwindcss.com/docs/adding-custom-styles#adding-base-styles= */

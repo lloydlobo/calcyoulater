@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-unresolved, import/extensions
 import { output } from "../main";
 
 // //////////////////////////CANVAS//////////////////////////////////////////
@@ -33,8 +34,8 @@ export function drawLineOnCanvas() {
     lastY
   );
 
-  hue = hue + 10 * Math.random();
-  context.strokeStyle = "hsl(" + hue + ", 50%, 50%)";
+  hue += 10 * Math.random();
+  context.strokeStyle = `hsl(${hue}, 50%, 50%)`;
   context.shadowColor = "white";
   context.shadowBlur = 10;
   context.stroke();
