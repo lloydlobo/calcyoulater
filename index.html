@@ -104,16 +104,27 @@
           <button class="keypad" id="btnResultEquals" value="=">=</button>
         </div>
         <!-- D3 Charts VIsualize DOcument Driven Data -->
-        <svg id="d3" class="d3"></svg>
+        <div class="d3-wrapper flow relative z-10 grid place-content-center">
+          <svg id="d3" class="d3 z-10 mb-4"></svg>
+          <label
+            id="d3Label"
+            for="d3"
+            class="text-center text-sm font-light"
+          ></label>
+          <canvas
+            id="visualizer"
+            class="absolute top-0 bottom-0 -z-10 h-full w-full rounded object-cover px-6"
+          ></canvas>
+        </div>
         <!-- CANVAS -->
-        <div
-          class="visualizer-wrapper place-content my-2 mx-6 h-min shadow-inner"
+        <!-- <div
+          class="visualizer-wrapper my-2 mx-6 h-min place-content-center shadow-inner"
         >
           <canvas
             id="visualizer"
             class="h-40 w-full rounded bg-slate-700 object-cover"
           ></canvas>
-        </div>
+        </div> -->
         <!-- FEED API FETCH -->
         <div class="crypto-results mx-6">
           <h2 id="crypto" class="flow bold my-2 uppercase text-neutral-300">
