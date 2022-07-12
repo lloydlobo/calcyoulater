@@ -3,7 +3,9 @@
 A calculator app for The Odin Project
 
 [Try it Live!](https://calcyoulater.vercel.app/)
-[![image](https://user-images.githubusercontent.com/76430758/178101591-eaaed8c7-afd1-4624-ae08-b2833867c33f.png)](https://calcyoulater.vercel.app/)
+![image](https://user-images.githubusercontent.com/76430758/178508858-f5e76d88-1db8-4b87-890e-3804863b1757.png)
+
+<!-- [![image](https://user-images.githubusercontent.com/76430758/178101591-eaaed8c7-afd1-4624-ae08-b2833867c33f.png)](https://calcyoulater.vercel.app/) -->
 
 
 
