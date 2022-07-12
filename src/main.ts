@@ -3,8 +3,15 @@
 /* eslint-disable no-console */
 import "./style.css";
 
+import * as d3 from "d3";
+// import { scaleBand, scaleLinear } from "d3-scale";
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
 import { calculate } from "./logic/calculator";
+// import { renderTree } from "./charts/tree";
+// import * as flare from "./charts/flare.json";
+// ////////////////END/////////////////////////////////////////
+
+// https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87
 
 // /////////////////////////APP//////////////////////////////////////////////
 
@@ -25,14 +32,49 @@ operator = "-";
 const resultCalculated = calculate(x, y, operator); // works!
 console.log("file: main.ts | line 18 | resultCalculated", resultCalculated);
 
+// ///////////////////////CHARTS D3//////////////////////////////////////////
+
+const d3Article = document.getElementById("d3");
+const d3Label = document.getElementById("d3Label") as HTMLLabelElement;
+if (!d3Article) throw new Error("d3 not found");
+
+const d3Array: any[] = [];
+
+async function drawChart(DUMMY_DATA: any[]) {
+  console.log(await DUMMY_DATA[9]);
+  if (!DUMMY_DATA) throw new Error("d3 not found");
+  // https://youtu.be/TOJ9yjvlapY
+  const xScale = d3
+    .scaleBand()
+    .domain(DUMMY_DATA.map((dataPoint) => dataPoint.coin))
+    .rangeRound([0, 250])
+    .padding(0.1);
+  const yScale = d3.scaleLinear().domain([0, 1000]).range([200, 0]);
+
+  const d3Container = d3.select("#d3").classed("container-d3", true);
+
+  const d3Bars = d3Container
+    .selectAll(".bar")
+    .data(DUMMY_DATA)
+    .enter()
+    .append("rect")
+    .classed("bar", true)
+    .attr("width", xScale.bandwidth())
+    .attr("height", (data) => 200 - yScale(data.value))
+    .attr("x", (data) => xScale(data.coin) as number)
+    .attr("y", (data) => yScale(data.value));
+  console.log(d3Bars);
+  // setTimeout(() => {
+  //   d3Bars.data(DUMMY_DATA.slice(0, 2)).exit().remove(); // exit opposite of enter & remove from DOM
+  // }, 2000);
+}
+
 // ///////////////////////FETCH FEED FROM API////////////////////////////////
 
 const feedDisplay = document.querySelector("#feed") as HTMLDivElement;
-
 const url = "https://crytpoku.herokuapp.com/crypto";
-
 // Add CORS Package in your backend server directory
-fetch(url)
+const dataFetch = fetch(url)
   .then((response) => response.json())
   .then((data) => {
     data.result.forEach((entry: any, index: number) => {
@@ -42,7 +84,7 @@ fetch(url)
       <div>
       <h3 id="coinTitle" class="title">
               <a href="https://www.google.com/search?q=${entry.Coin}">
-                ${entry.Coin}
+              ${entry.Coin}
                 </a>
                 </h3>
                 <div class="price">
@@ -66,10 +108,30 @@ fetch(url)
                 </div>
                 `;
         feedDisplay.insertAdjacentHTML("beforeend", articleItem);
+
+        (async () =>
+          d3Array.push({
+            id: (index + 1).toString(),
+            price:
+              parseFloat((await entry.Price).substring(1).replace(/,/, "")) *
+              0.01, // remove $ char, and replace , with empty string
+            value: parseFloat(entry.Marketcap) * 100,
+            coin: await entry.Coin,
+          }))();
       }
     });
   })
   .catch((err) => console.error(err));
+
+(async () => {
+  // use this to wait till the data is fetched
+  await dataFetch;
+  // and then draw d3 chart when d3Array is populated in the stack/heap?
+  // FIXME
+  await drawChart(d3Array); // uses a global variable
+  if (!d3Label) throw new Error("d3 not found");
+  d3Label.textContent = "Market Cap";
+})();
 
 // ////////////////CONSTANTS///////////////////////////////////
 const outputDisplay = document.querySelector("#output") as HTMLOutputElement;
@@ -90,7 +152,7 @@ allButtons.forEach((btn) => {
   allBtn.push(btn);
 });
 
-console.dir(allBtn);
+// console.dir(allBtn);
 
 function getBtnValue(value: any) {
   let counterNum = 0; // for no. of clicks and keystrokes
@@ -187,7 +249,10 @@ allBtn.forEach((btn) => {
 const outputVal = outputDisplay.textContent;
 
 // eslint-disable-next-line import/prefer-default-export, import/no-mutable-exports
-export let output: number;
+
+// eslint-disable-next-line import/prefer-default-export, import/no-mutable-exports
+export let output: number; // canvas animation
+
 if (outputVal) {
   output = parseInt(outputVal, 10);
   // console.log(output);
@@ -206,10 +271,7 @@ const animateCanvas = (
 // MAIN
 function main() {
   animateCanvas(1000, 1000);
+  // renderD3Chart();
 }
 
 main();
-
-// ////////////////END/////////////////////////////////////////
-
-// https://stackoverflow.com/questions/42628635/element-insertadjacenthtml-api-throws-error-in-chrome-55-0-2883-87

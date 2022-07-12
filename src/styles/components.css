@@ -56,3 +56,13 @@ body::-webkit-scrollbar-thumb {
 #output {
   font-family: var(--font-mono-noto);
 }
+
+.container-d3 {
+  width: 250px;
+  height: 200px;
+  /* border: 1px solid #56dabd; */
+}
+
+.bar {
+  fill: #56dabd;
+}
