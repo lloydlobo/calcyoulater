@@ -36,13 +36,11 @@ const cacheDigitsArray: (string | number)[] = [];
 
 // MUTABLE VARIABLES
 const allBtn: HTMLButtonElement[] = [];
-
 // Spread btnAll to access forEach method
 const allButtons = [...btnAll];
 allButtons.forEach((btn) => {
   allBtn.push(btn);
 });
-// console.log(operatorArith);
 
 // disableNumbers(); // disableOperators(); // disableEquals(); // disableAll(); // disableMemory(); // disableClear(); // disablePlusMinus();
 
@@ -62,18 +60,18 @@ const animateCanvas = (
   setInterval(fillBlankOnCanvas, blankTime);
 };
 
-// ////////////////MAIN////////////////////////////////////////
-function main() {
+// ////////////////DRAW CANVAS////////////////////////////////////////
+function drawCanvas() {
   animateCanvas(1000, 1000);
 }
+drawCanvas();
 
-main();
-
+// ////////////////DOM DISPLAY INPUT////////////////////////////////////////
 function isAOperator(val: string) {
   return val === "-" || val === "+" || val === "*" || val === "/";
 }
 
-const displayPersist = (val: string | number) => {
+function displayPersist(val: string | number) {
   console.log({ val });
   if (isAOperator(val as string)) {
     if (typeof val === "string") {
@@ -90,25 +88,26 @@ const displayPersist = (val: string | number) => {
       val.toLocaleString()
     );
   }
-};
+}
 
 // ///////////////////////SETUP//////////////////////////////////////////////
+
+// START OF GLOBAL VARIABLES
 let x: number | null = null;
 let y: number | null = null;
 let operator: string | null = null;
-
 let data = 0;
+// END OF GLOBAL VARIABLES
 
-const resetValues = (a: number | null, b: number | null, z: string | null) => {
+function resetValues(a: number | null, b: number | null, z: string | null) {
   a = null;
   b = null;
   z = null;
-
   x = a;
   y = b;
   operator = z;
   return [x, y, operator];
-};
+}
 
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -163,23 +162,21 @@ function operateSwitch(
 
 function operate() {
   if (!x || !y || !operator) throw new Error("Invalid data");
-
   let result = operateSwitch(x, y, operator);
-  if (!result) {
-    result = x + y;
-  }
+  if (!result) result = 0;
 
   outputDisplay.textContent = result.toLocaleString();
+  inputHistory.textContent = outputDisplay.textContent; // FIXME
+
   cacheResultsArray.push(outputDisplay.textContent);
 
   resetValues(x, y, operator);
-
-  inputHistory.textContent = outputDisplay.textContent; // FIXME
   outputDisplay.textContent = "0";
 
-  console.log(cacheDigitsArray, cacheResultsArray);
+  return { x, y, operator };
 }
 
+// Calculate result when "=" is entered/clicked
 btnCalculate.addEventListener("click", operate);
 
 // ////////////////END/////////////////////////////////////////
