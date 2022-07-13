@@ -3,7 +3,7 @@
 
 // ////////////////POSSIBLE OPERATOR OBJECT ////////////////////////
 
-const operatorArith = [
+export const operatorArith = [
   { name: "division", operator: "/" },
   { name: "multiplication", operator: "*" },
   { name: "addition", operator: "+" },

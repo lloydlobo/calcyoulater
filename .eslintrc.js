@@ -14,4 +14,9 @@ module.exports = {
   rules: {
     "prettier/prettier": "error",
   },
+  // settings: {
+  //   "import/resolver": {
+  //     project: "/tsconfig.json",
+  //   },
+  // },
 };
