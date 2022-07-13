@@ -39,6 +39,15 @@
   }
   button.keypad {
     padding-block: theme(padding.2);
+
+    &:disabled {
+      background-color: hsl(220 16% 37% / 0.618);
+      filter: blur(1.618px);
+
+      &:hover {
+        transform: translate(0px, 0px);
+      }
+    }
   }
 }
 @layer utilities {
