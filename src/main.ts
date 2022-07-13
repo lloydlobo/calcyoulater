@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */ /* eslint-disable import/no-mutable-exports */ /* eslint-disable import/no-unresolved */ /* eslint-disable import/extensions */ /* eslint-disable no-console */
 import "./style.css";
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
-import { calculate, operatorArith } from "./logic/calculator";
+import { operatorArith } from "./logic/calculator";
 import { drawData } from "./charts/drawData";
 
 // /////////////////////////APP//////////////////////////////////////////////
@@ -28,8 +28,12 @@ export const outputDisplay = document.querySelector(
   "#output"
 ) as HTMLOutputElement;
 const btnAll = document.getElementsByTagName("button") as any;
+
+const btnCalculate = document.getElementById(
+  "btnResultEquals"
+) as HTMLButtonElement;
+
 export const inputHistory = document.querySelector("#inputHistory") as any;
-inputHistory.textContent = "Input History FIXME"; // FIXME
 
 // MUTABLE VARIABLES
 const allBtn: HTMLButtonElement[] = [];
@@ -75,26 +79,115 @@ function main() {
 
 main();
 
+function isAOperator(val: string) {
+  return val === "-" || val === "+" || val === "*" || val === "/";
+}
+
+const displayPersist = (val: string | number) => {
+  console.log({ val });
+  if (isAOperator(val as string)) {
+    if (typeof val === "string") {
+      outputDisplay.textContent = outputDisplay.textContent!.concat(val);
+    }
+  } else {
+    // if (outputDisplay.textContent?.endsWith("0")) {
+    //   const index = outputDisplay.textContent.lastIndexOf("0");
+    //   outputDisplay.textContent.slice(-index);
+    // }
+    if (
+      outputDisplay.textContent === "0" &&
+      outputDisplay.textContent.length === 1
+    ) {
+      outputDisplay.textContent = "";
+    }
+    outputDisplay.textContent = outputDisplay.textContent!.concat(
+      val.toLocaleString()
+    );
+  }
+};
+
 // ///////////////////////LOGIC//////////////////////////////////////////////
 
-let x = null;
-let y = null;
-let operator = null;
+let x: number | null = null;
+let y: number | null = null;
+let operator: string | null = null;
 
-x = 5;
-y = 2;
+let data = 0;
 
-operator = "-";
+const resetValues = (a: number | null, b: number | null, z: string | null) => {
+  a = null;
+  b = null;
+  z = null;
 
-x = 7;
-y = 6;
+  x = a;
+  y = b;
+  operator = z;
+  return [x, y, operator];
+};
 
-operator = "*";
-const resultCalculated = calculate(x, y, operator); // works!
-if (!resultCalculated) throw new Error("resultCalculated error");
+allBtn.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const val = btn.value;
+    if (isAOperator(val)) {
+      operator = val;
+      displayPersist(operator);
+    }
+    if (val === "=") return;
+    data = parseFloat(val);
+    if (!x) {
+      x = data;
+      displayPersist(x);
+      console.log({ x });
+    } else {
+      y = data;
+      if (!y) return;
+      displayPersist(y);
+      console.log({ y });
+    }
+    console.log({ x, y, operator });
+  });
+});
 
-outputDisplay.textContent = resultCalculated[0].toLocaleString();
-
-console.log("file: main.ts | line 18 | resultCalculated", resultCalculated);
+if (data === undefined) throw new Error("Invalid data");
 
 // ////////////////END/////////////////////////////////////////
+
+function operateSwitch(
+  l: number,
+  m: number,
+  operatorType: string
+): number | null {
+  let result = null;
+
+  if (operatorType === "/") {
+    result = l / m;
+  }
+  if (operatorType === "*") {
+    result = l * m;
+  }
+  if (operatorType === "+") {
+    result = l + m;
+  }
+  if (operatorType === "-") {
+    result = l - m;
+  }
+  return result;
+}
+
+function operate() {
+  if (!x || !y || !operator) throw new Error("Invalid data");
+  console.log({ x, y, operator });
+
+  let result = operateSwitch(x, y, operator);
+  if (!result) {
+    result = x + y;
+  }
+
+  console.log({ result });
+  outputDisplay.textContent = result.toLocaleString();
+  resetValues(x, y, operator);
+  inputHistory.textContent = outputDisplay.textContent; // FIXME
+  outputDisplay.textContent = "0";
+}
+
+btnCalculate.addEventListener("click", operate);
