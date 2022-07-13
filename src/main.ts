@@ -34,6 +34,8 @@ const btnCalculate = document.getElementById(
 ) as HTMLButtonElement;
 
 export const inputHistory = document.querySelector("#inputHistory") as any;
+const cacheResultsArray: string[] = [];
+const cacheDigitsArray: (string | number)[] = [];
 
 // MUTABLE VARIABLES
 const allBtn: HTMLButtonElement[] = [];
@@ -131,6 +133,7 @@ allBtn.forEach((btn) => {
     if (isAOperator(val)) {
       operator = val;
       displayPersist(operator);
+      cacheDigitsArray.push(operator); // FIXME maybe make it a json object with titles
     }
     if (val === "=") return;
     data = parseFloat(val);
@@ -138,11 +141,13 @@ allBtn.forEach((btn) => {
       x = data;
       displayPersist(x);
       console.log({ x });
+      cacheDigitsArray.push(x);
     } else {
       y = data;
       if (!y) return;
       displayPersist(y);
       console.log({ y });
+      cacheDigitsArray.push(y);
     }
     console.log({ x, y, operator });
   });
@@ -176,18 +181,21 @@ function operateSwitch(
 
 function operate() {
   if (!x || !y || !operator) throw new Error("Invalid data");
-  console.log({ x, y, operator });
 
   let result = operateSwitch(x, y, operator);
   if (!result) {
     result = x + y;
   }
 
-  console.log({ result });
   outputDisplay.textContent = result.toLocaleString();
+  cacheResultsArray.push(outputDisplay.textContent);
+
   resetValues(x, y, operator);
+
   inputHistory.textContent = outputDisplay.textContent; // FIXME
   outputDisplay.textContent = "0";
+
+  console.log(cacheDigitsArray, cacheResultsArray);
 }
 
 btnCalculate.addEventListener("click", operate);
