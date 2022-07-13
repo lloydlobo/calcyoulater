@@ -78,12 +78,14 @@
         </div>
 
         <div class="keypads grid px-4 sm:px-4">
-          <button class="keypad" id="btnM" value="MC">MC</button>
-          <button class="keypad" id="btnM" value="MR">MR</button>
-          <button class="keypad" id="btnM" value="M-">M-</button>
-          <button class="keypad" id="btnM" value="M+">M+</button>
+          <button disabled class="keypad" id="btnM" value="MC">MC</button>
+          <button disabled class="keypad" id="btnM" value="MR">MR</button>
+          <button disabled class="keypad" id="btnM" value="M-">M-</button>
+          <button disabled class="keypad" id="btnM" value="M+">M+</button>
           <button class="keypad" id="btnOperators" value="/">%</button>
-          <button class="keypad" id="btnPlusMinus" value="+/-">+/-</button>
+          <button disabled class="keypad" id="btnPlusMinus" value="+/-">
+            +/-
+          </button>
           <button class="keypad" id="btnNumbers" value="7">7</button>
           <button class="keypad" id="btnNumbers" value="8">8</button>
           <button class="keypad" id="btnNumbers" value="9">9</button>
@@ -98,19 +100,26 @@
           <button class="keypad" id="btnNumbers" value="2">2</button>
           <button class="keypad" id="btnNumbers" value="3">3</button>
           <button class="keypad btn-plus" id="btnOperators" value="+">+</button>
+          <button disabled class="keypad" id="btnNumbers" value="00">00</button>
           <button class="keypad" id="btnNumbers" value="0">0</button>
-          <button class="keypad" id="btnNumbers" value="00">00</button>
-          <button class="keypad" id="btndecimal" value=".">.</button>
+          <button disabled class="keypad" id="btndecimal" value=".">.</button>
           <button class="keypad" id="btnResultEquals" value="=">=</button>
         </div>
         <!-- D3 Charts VIsualize DOcument Driven Data -->
-        <div class="d3-wrapper flow relative z-10 grid place-content-center">
+        <div
+          class="d3-wrapper flow relative z-10 grid place-content-center gap-0"
+        >
           <svg id="d3" class="d3 z-10 mb-4"></svg>
           <label
             id="d3Label"
             for="d3"
-            class="text-center text-sm font-light"
+            class="mb-0 text-center text-sm font-light"
           ></label>
+          <button
+            id="btnD3Category"
+            class="keypad mt-0 items-center justify-self-center text-center text-sm font-light"
+            disabled
+          ></button>
           <canvas
             id="visualizer"
             class="absolute top-0 bottom-0 -z-10 h-full w-full rounded object-cover px-6"
