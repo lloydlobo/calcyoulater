@@ -1,17 +1,15 @@
 /* eslint-disable no-param-reassign */ /* eslint-disable import/no-mutable-exports */ /* eslint-disable import/no-unresolved */ /* eslint-disable import/extensions */ /* eslint-disable no-console */
 import "./style.css";
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
-import { operatorArith } from "./logic/calculator";
 import { drawData } from "./charts/drawData";
+// import { operatorArith } from "./logic/calculator";
 
 // /////////////////////////APP//////////////////////////////////////////////
-
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const appClass = app.className;
 appClass.toLowerCase();
 
 // ///////////////////////CHARTS D3//////////////////////////////////////////
-
 const d3Article = document.getElementById("d3");
 export const d3Label = document.getElementById("d3Label") as HTMLLabelElement;
 export const btnD3Category = document.getElementById(
@@ -19,7 +17,6 @@ export const btnD3Category = document.getElementById(
 ) as HTMLButtonElement;
 if (!d3Article) throw new Error("d3 not found");
 export const d3Array: any[] = [];
-
 // D3 DATA RENDERING !!!!
 drawData();
 
@@ -42,21 +39,14 @@ const allBtn: HTMLButtonElement[] = [];
 
 // Spread btnAll to access forEach method
 const allButtons = [...btnAll];
-
 allButtons.forEach((btn) => {
   allBtn.push(btn);
 });
-console.log(operatorArith);
+// console.log(operatorArith);
 
-// disableNumbers();
-// disableOperators();
-// disableEquals();
-// disableAll();
-// disableMemory();
-// disableClear();
-// disablePlusMinus();
+// disableNumbers(); // disableOperators(); // disableEquals(); // disableAll(); // disableMemory(); // disableClear(); // disablePlusMinus();
+
 // ////////////////CANVAS//////////////////////////////////////
-
 // GET TEXT From User Input in DOM Display
 const outputVal = outputDisplay.textContent;
 export let output: number; // canvas animation
@@ -73,8 +63,6 @@ const animateCanvas = (
 };
 
 // ////////////////MAIN////////////////////////////////////////
-
-// MAIN
 function main() {
   animateCanvas(1000, 1000);
 }
@@ -92,10 +80,6 @@ const displayPersist = (val: string | number) => {
       outputDisplay.textContent = outputDisplay.textContent!.concat(val);
     }
   } else {
-    // if (outputDisplay.textContent?.endsWith("0")) {
-    //   const index = outputDisplay.textContent.lastIndexOf("0");
-    //   outputDisplay.textContent.slice(-index);
-    // }
     if (
       outputDisplay.textContent === "0" &&
       outputDisplay.textContent.length === 1
@@ -108,8 +92,7 @@ const displayPersist = (val: string | number) => {
   }
 };
 
-// ///////////////////////LOGIC//////////////////////////////////////////////
-
+// ///////////////////////SETUP//////////////////////////////////////////////
 let x: number | null = null;
 let y: number | null = null;
 let operator: string | null = null;
@@ -155,8 +138,7 @@ allBtn.forEach((btn) => {
 
 if (data === undefined) throw new Error("Invalid data");
 
-// ////////////////END/////////////////////////////////////////
-
+// ////////////////LOGIC/////////////////////////////////////////
 function operateSwitch(
   l: number,
   m: number,
@@ -199,3 +181,5 @@ function operate() {
 }
 
 btnCalculate.addEventListener("click", operate);
+
+// ////////////////END/////////////////////////////////////////
