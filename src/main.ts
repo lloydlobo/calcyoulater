@@ -21,10 +21,13 @@ export const d3Array: any[] = [];
 drawData();
 
 // ////////////////CONSTANTS///////////////////////////////////
-export const outputDisplay = document.querySelector(
-  "#output"
-) as HTMLOutputElement;
+export const outputDisplay = document.querySelector( "#output") as HTMLOutputElement; // prettier-ignore
 const btnAll = document.getElementsByTagName("button") as any;
+const btnClear = document.getElementById("btnClear") as HTMLButtonElement;
+const btnAllClear = document.getElementById("btnAllClear") as HTMLButtonElement;
+
+const btnClearArray = [btnClear, btnAllClear];
+const btnDecimal = document.getElementById("btnDecimal") as HTMLButtonElement;
 
 const btnCalculate = document.getElementById(
   "btnResultEquals"
@@ -101,8 +104,7 @@ let x: number | null = null;
 let y: number | null = null;
 let operator: string | null = null;
 let data = 0;
-// END OF GLOBAL VARIABLES
-const inputArray: string[] = [];
+let inputArray: string[] = [];
 
 function equalsIsClicked(val: string) {
   if (val !== "=") return false;
@@ -118,6 +120,21 @@ function resetValues(a: number | null, b: number | null, z: string | null) {
   operator = z;
   return [x, y, operator];
 }
+let toggle = true;
+
+function clickDecimalOnce() {
+  if (toggle) {
+    btnDecimal.disabled = true;
+  } else {
+    btnDecimal.disabled = false;
+  }
+  toggle = !toggle;
+}
+btnDecimal.removeEventListener("click", clickDecimalOnce, false);
+// allow decimal to be pressed only once
+btnDecimal.addEventListener("click", () => {
+  clickDecimalOnce();
+});
 
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
@@ -212,6 +229,8 @@ function operate() {
   resetValues(x, y, operator);
   inputHistory.textContent = `Ans = ${valString}`; // FIXME
   outputDisplay.textContent = valString;
+  toggle = false;
+  clickDecimalOnce();
 
   inputCount += 1; // prepare all inputs to be pushed in next array step
   return { x, y, operator, inputCount };
@@ -221,3 +240,16 @@ function operate() {
 btnCalculate.addEventListener("click", operate);
 
 // ////////////////END/////////////////////////////////////////
+
+btnClearArray.forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    console.log(btn, "clear");
+    outputDisplay.textContent = "0";
+    inputCount = 0;
+    operatorCount = 0;
+    valString = "";
+    inputArray = [];
+    data = 0;
+    resetValues(x, y, operator);
+  });
+});
