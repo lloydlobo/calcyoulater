@@ -26,6 +26,10 @@ const btnAll = document.getElementsByTagName("button") as any;
 const btnClear = document.getElementById("btnClear") as HTMLButtonElement;
 const btnAllClear = document.getElementById("btnAllClear") as HTMLButtonElement;
 
+const btnGetHistory = document.getElementById(
+  "btnHistory"
+) as HTMLButtonElement;
+
 const btnClearArray = [btnClear, btnAllClear];
 const btnDecimal = document.getElementById("btnDecimal") as HTMLButtonElement;
 
@@ -105,6 +109,7 @@ let y: number | null = null;
 let operator: string | null = null;
 let data = 0;
 let inputArray: string[] = [];
+const resultInputArray: string[] = [];
 
 function equalsIsClicked(val: string) {
   if (val !== "=") return false;
@@ -112,12 +117,15 @@ function equalsIsClicked(val: string) {
 }
 
 function resetValues(a: number | null, b: number | null, z: string | null) {
-  a = null;
-  b = null;
-  z = null;
   x = a;
   y = b;
   operator = z;
+
+  x = null;
+  y = null;
+  operator = null;
+
+  console.log({ x, y, operator });
   return [x, y, operator];
 }
 let toggle = true;
@@ -212,6 +220,7 @@ function operateSwitch(
   return result;
 }
 
+let savedCurrentOperateHistory = "";
 function operate() {
   console.log({ inputArray });
   inputArray.push(valString);
@@ -219,7 +228,9 @@ function operate() {
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
   if (!result) result = 0;
+
   valString = result.toString(); // reset valString - so first item is result
+  resultInputArray.push(valString);
   console.log({ valString });
   if (!outputDisplay.textContent)
     throw new Error("Output display is undefined");
@@ -228,9 +239,11 @@ function operate() {
 
   resetValues(x, y, operator);
   inputHistory.textContent = `Ans = ${valString}`; // FIXME
+  savedCurrentOperateHistory = inputHistory.textContent;
   outputDisplay.textContent = valString;
   toggle = false;
   clickDecimalOnce();
+  btnGetHistory.style.opacity = "1";
 
   inputCount += 1; // prepare all inputs to be pushed in next array step
   return { x, y, operator, inputCount };
@@ -241,15 +254,60 @@ btnCalculate.addEventListener("click", operate);
 
 // ////////////////END/////////////////////////////////////////
 
+function disableHideHistoryButton() {
+  if (inputArray.length === 0) {
+    console.log("disabled");
+    btnGetHistory.disabled = true;
+    btnGetHistory.style.opacity = "0";
+  }
+}
+
 btnClearArray.forEach((btn) => {
   btn.addEventListener("click", async () => {
+    if (btn.value === "AC") {
+      inputArray = [];
+      disableHideHistoryButton();
+    }
     console.log(btn, "clear");
     outputDisplay.textContent = "0";
+    inputHistory.textContent = "Ans = 0";
     inputCount = 0;
     operatorCount = 0;
     valString = "";
-    inputArray = [];
     data = 0;
     resetValues(x, y, operator);
   });
+});
+
+disableHideHistoryButton();
+
+// HISTORY
+
+const inputOutputArray: string[] = [];
+
+let countResults = 0;
+let toggled = false;
+btnGetHistory.addEventListener("click", () => {
+  if (!toggled) {
+    toggled = true;
+  } else {
+    toggled = false;
+  }
+  if (inputArray.length > 0 && countResults < resultInputArray.length) {
+    const saveHistoryResult = resultInputArray.join(" ");
+    console.log({ saveHistoryResult });
+    let inputOutput = "";
+    for (let i = countResults; i < resultInputArray.length; i += 1) {
+      inputOutput = ` ${inputArray[i]} = ${resultInputArray[i]} `;
+      inputOutputArray.push(inputOutput);
+    }
+    countResults = resultInputArray.length;
+  }
+  if (toggled) {
+    inputHistory.textContent = inputOutputArray;
+    toggled = true;
+  } else {
+    inputHistory.textContent = savedCurrentOperateHistory;
+    toggled = false;
+  }
 });
