@@ -109,7 +109,7 @@ let y: number | null = null;
 let operator: string | null = null;
 let data = 0;
 let inputArray: string[] = [];
-const resultInputArray: string[] = [];
+let resultInputArray: string[] = [];
 
 function equalsIsClicked(val: string) {
   if (val !== "=") return false;
@@ -221,6 +221,8 @@ function operateSwitch(
 }
 
 let savedCurrentOperateHistory = "";
+let countResultsForHistory = 0;
+
 function operate() {
   console.log({ inputArray });
   inputArray.push(valString);
@@ -235,8 +237,6 @@ function operate() {
   if (!outputDisplay.textContent)
     throw new Error("Output display is undefined");
   cacheResultsArray.push(outputDisplay.textContent);
-  // outputDisplay.textContent = result.toLocaleString();
-
   resetValues(x, y, operator);
   inputHistory.textContent = `Ans = ${valString}`; // FIXME
   savedCurrentOperateHistory = inputHistory.textContent;
@@ -262,13 +262,17 @@ function disableHideHistoryButton() {
   }
 }
 
+let inputOutputArray: string[] = [];
 btnClearArray.forEach((btn) => {
   btn.addEventListener("click", async () => {
     if (btn.value === "AC") {
       inputArray = [];
+      resultInputArray = [];
+      countResultsForHistory = 0;
+      savedCurrentOperateHistory = "";
+      inputOutputArray = [];
       disableHideHistoryButton();
     }
-    console.log(btn, "clear");
     outputDisplay.textContent = "0";
     inputHistory.textContent = "Ans = 0";
     inputCount = 0;
@@ -283,9 +287,6 @@ disableHideHistoryButton();
 
 // HISTORY
 
-const inputOutputArray: string[] = [];
-
-let countResults = 0;
 let toggled = false;
 btnGetHistory.addEventListener("click", () => {
   if (!toggled) {
@@ -293,15 +294,18 @@ btnGetHistory.addEventListener("click", () => {
   } else {
     toggled = false;
   }
-  if (inputArray.length > 0 && countResults < resultInputArray.length) {
+  if (
+    inputArray.length > 0 &&
+    countResultsForHistory < resultInputArray.length
+  ) {
     const saveHistoryResult = resultInputArray.join(" ");
     console.log({ saveHistoryResult });
     let inputOutput = "";
-    for (let i = countResults; i < resultInputArray.length; i += 1) {
+    for (let i = countResultsForHistory; i < resultInputArray.length; i += 1) {
       inputOutput = ` ${inputArray[i]} = ${resultInputArray[i]} `;
       inputOutputArray.push(inputOutput);
     }
-    countResults = resultInputArray.length;
+    countResultsForHistory = resultInputArray.length;
   }
   if (toggled) {
     inputHistory.textContent = inputOutputArray;
