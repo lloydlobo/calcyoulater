@@ -67,13 +67,13 @@ function drawCanvas() {
 drawCanvas();
 
 // ////////////////DOM DISPLAY INPUT////////////////////////////////////////
-function isAOperator(val: string) {
+function operatorIsClicked(val: string) {
   return val === "-" || val === "+" || val === "*" || val === "/";
 }
 
 function displayPersist(val: string | number) {
   console.log({ val });
-  if (isAOperator(val as string)) {
+  if (operatorIsClicked(val as string)) {
     if (typeof val === "string") {
       outputDisplay.textContent = outputDisplay.textContent!.concat(val);
     }
@@ -92,12 +92,22 @@ function displayPersist(val: string | number) {
 
 // ///////////////////////SETUP//////////////////////////////////////////////
 
+let inputCount = 0;
+let operatorCount = 0;
+
+let valString = "";
 // START OF GLOBAL VARIABLES
 let x: number | null = null;
 let y: number | null = null;
 let operator: string | null = null;
 let data = 0;
 // END OF GLOBAL VARIABLES
+const inputArray: string[] = [];
+
+function equalsIsClicked(val: string) {
+  if (val !== "=") return false;
+  return true;
+}
 
 function resetValues(a: number | null, b: number | null, z: string | null) {
   a = null;
@@ -112,25 +122,51 @@ function resetValues(a: number | null, b: number | null, z: string | null) {
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
     const val = btn.value;
-    if (isAOperator(val)) {
+    if (!equalsIsClicked(val)) {
+      valString = valString.concat(val);
+      console.log(valString);
+    }
+    console.log({ inputArray });
+    if (operatorIsClicked(val)) {
+      operatorCount += 1; // switch off x_concat as it now takes result
+      console.log({ operatorCount });
       operator = val;
       displayPersist(operator);
       cacheDigitsArray.push(operator); // FIXME maybe make it a json object with titles
     }
     if (val === "=") return;
     data = parseFloat(val);
-    if (!x) {
-      x = data;
-      displayPersist(x);
-      console.log({ x });
-      cacheDigitsArray.push(x);
-    } else {
-      y = data;
-      if (!y) return;
-      displayPersist(y);
-      console.log({ y });
-      cacheDigitsArray.push(y);
+
+    // TODO When AC or C is pressed rest inputCount to
+    if (inputCount > 0) {
+      x = parseFloat(valString.trim());
+      // displayPersist(valString);
     }
+
+    if (!x || x.toString().length < 1) {
+      x = parseFloat(val.trim());
+      displayPersist(val);
+      cacheDigitsArray.push(x);
+    } else if (
+      x.toString().length >= 1 &&
+      !operatorIsClicked(val) &&
+      operatorCount === 0
+    ) {
+      x = parseFloat(x.toString().concat(val));
+      console.log({ x_concat: x });
+      displayPersist(val);
+    }
+
+    if (operatorCount > 0 && !operatorIsClicked(val)) {
+      if (!y || y.toString().length < 1) {
+        y = parseFloat(val);
+        displayPersist(val);
+      } else if (y.toString().length >= 1) {
+        y = parseFloat(y.toString().concat(val));
+        displayPersist(val);
+      }
+    }
+
     console.log({ x, y, operator });
   });
 });
@@ -144,7 +180,6 @@ function operateSwitch(
   operatorType: string
 ): number | null {
   let result = null;
-
   if (operatorType === "/") {
     result = l / m;
   }
@@ -161,19 +196,25 @@ function operateSwitch(
 }
 
 function operate() {
+  console.log({ inputArray });
+  inputArray.push(valString);
+
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
   if (!result) result = 0;
-
-  outputDisplay.textContent = result.toLocaleString();
-  inputHistory.textContent = outputDisplay.textContent; // FIXME
-
+  valString = result.toString(); // reset valString - so first item is result
+  console.log({ valString });
+  if (!outputDisplay.textContent)
+    throw new Error("Output display is undefined");
   cacheResultsArray.push(outputDisplay.textContent);
+  // outputDisplay.textContent = result.toLocaleString();
 
   resetValues(x, y, operator);
-  outputDisplay.textContent = "0";
+  inputHistory.textContent = `Ans = ${valString}`; // FIXME
+  outputDisplay.textContent = valString;
 
-  return { x, y, operator };
+  inputCount += 1; // prepare all inputs to be pushed in next array step
+  return { x, y, operator, inputCount };
 }
 
 // Calculate result when "=" is entered/clicked
