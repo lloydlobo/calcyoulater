@@ -140,8 +140,9 @@ allBtn.forEach((btn) => {
     // TODO When AC or C is pressed rest inputCount to
     if (inputCount > 0) {
       x = parseFloat(valString.trim());
-      displayPersist(valString);
+      // displayPersist(valString);
     }
+
     if (!x || x.toString().length < 1) {
       x = parseFloat(val.trim());
       displayPersist(val);
@@ -155,6 +156,7 @@ allBtn.forEach((btn) => {
       console.log({ x_concat: x });
       displayPersist(val);
     }
+
     if (operatorCount > 0 && !operatorIsClicked(val)) {
       if (!y || y.toString().length < 1) {
         y = parseFloat(val);
@@ -165,14 +167,6 @@ allBtn.forEach((btn) => {
       }
     }
 
-    console.log({ y, val });
-    // else {
-    //   y = data;
-    //   if (!y) return;
-    //   displayPersist(y);
-    //   console.log({ y });
-    //   cacheDigitsArray.push(y);
-    // }
     console.log({ x, y, operator });
   });
 });
@@ -210,13 +204,14 @@ function operate() {
   if (!result) result = 0;
   valString = result.toString(); // reset valString - so first item is result
   console.log({ valString });
-  outputDisplay.textContent = result.toLocaleString();
-  inputHistory.textContent = outputDisplay.textContent; // FIXME
-
+  if (!outputDisplay.textContent)
+    throw new Error("Output display is undefined");
   cacheResultsArray.push(outputDisplay.textContent);
+  // outputDisplay.textContent = result.toLocaleString();
 
   resetValues(x, y, operator);
-  outputDisplay.textContent = "0";
+  inputHistory.textContent = `Ans = ${valString}`; // FIXME
+  outputDisplay.textContent = valString;
 
   inputCount += 1; // prepare all inputs to be pushed in next array step
   return { x, y, operator, inputCount };
