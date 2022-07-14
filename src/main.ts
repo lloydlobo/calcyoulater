@@ -68,7 +68,7 @@ drawCanvas();
 
 // ////////////////DOM DISPLAY INPUT////////////////////////////////////////
 function operatorIsClicked(val: string) {
-  return val === "-" || val === "+" || val === "*" || val === "/";
+  return val === "-" || val === "+" || val === "*" || val === "÷";
 }
 
 function displayPersist(val: string | number) {
@@ -180,7 +180,7 @@ function operateSwitch(
   operatorType: string
 ): number | null {
   let result = null;
-  if (operatorType === "/") {
+  if (operatorType === "÷") {
     result = l / m;
   }
   if (operatorType === "*") {
