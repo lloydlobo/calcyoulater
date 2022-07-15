@@ -1,15 +1,16 @@
-/* eslint-disable no-param-reassign */ /* eslint-disable import/no-mutable-exports */ /* eslint-disable import/no-unresolved */ /* eslint-disable import/extensions */ /* eslint-disable no-console */
+/* eslint-disable import/no-unresolved */ /* eslint-disable import/extensions */ /* eslint-disable no-console */
+
 import "./style.css";
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
 import { drawData } from "./charts/drawData";
 // import { operatorArith } from "./logic/calculator";
 
-// /////////////////////////APP//////////////////////////////////////////////
+// /////////////////////////APP///////
 const app = document.querySelector<HTMLDivElement>("#app")!;
 const appClass = app.className;
 appClass.toLowerCase();
 
-// ///////////////////////CHARTS D3//////////////////////////////////////////
+// ///////////////////////CHARTS D3///
 const d3Article = document.getElementById("d3");
 export const d3Label = document.getElementById("d3Label") as HTMLLabelElement;
 export const btnD3Category = document.getElementById(
@@ -20,7 +21,7 @@ export const d3Array: any[] = [];
 // D3 DATA RENDERING !!!!
 drawData();
 
-// ////////////////CONSTANTS///////////////////////////////////
+// ////////////////CONSTANTS/////////
 export const outputDisplay = document.querySelector( "#output") as HTMLOutputElement; // prettier-ignore
 const btnAll = document.getElementsByTagName("button") as any;
 const btnClear = document.getElementById("btnClear") as HTMLButtonElement;
@@ -38,8 +39,9 @@ const btnCalculate = document.getElementById(
 ) as HTMLButtonElement;
 
 export const inputHistory = document.querySelector("#inputHistory") as any;
-const cacheResultsArray: string[] = [];
-const cacheDigitsArray: (string | number)[] = [];
+let cacheResultsArray: string[] = [];
+let cacheDigitsArray: (string | number)[] = [];
+let cacheOperatorsArray: string[] = [];
 
 // MUTABLE VARIABLES
 const allBtn: HTMLButtonElement[] = [];
@@ -51,13 +53,12 @@ allButtons.forEach((btn) => {
 
 // disableNumbers(); // disableOperators(); // disableEquals(); // disableAll(); // disableMemory(); // disableClear(); // disablePlusMinus();
 
-// ////////////////CANVAS//////////////////////////////////////
+// ////////////////CANVAS////////////
 // GET TEXT From User Input in DOM Display
 const outputVal = outputDisplay.textContent;
-export let output: number; // canvas animation
-if (outputVal) {
-  output = parseInt(outputVal, 10);
-}
+if (!outputVal) throw new Error("outputVal is not defined");
+export const output = parseInt(outputVal, 10); // animate canvas with a variable
+
 // Animate the canvas at intervals
 const animateCanvas = (
   drawTime: number | undefined,
@@ -67,13 +68,13 @@ const animateCanvas = (
   setInterval(fillBlankOnCanvas, blankTime);
 };
 
-// ////////////////DRAW CANVAS////////////////////////////////////////
+// ////////////////DRAW CANVAS//////////
 function drawCanvas() {
   animateCanvas(1000, 1000);
 }
 drawCanvas();
 
-// ////////////////DOM DISPLAY INPUT////////////////////////////////////////
+// ////////////////DOM DISPLAY INPUT/////
 function operatorIsClicked(val: string) {
   return val === "-" || val === "+" || val === "*" || val === "÷";
 }
@@ -97,7 +98,7 @@ function displayPersist(val: string | number) {
   }
 }
 
-// ///////////////////////SETUP//////////////////////////////////////////////
+// ///////////////////////SETUP//////////
 
 let inputCount = 0;
 let operatorCount = 0;
@@ -139,6 +140,7 @@ function clickDecimalOnce() {
   toggle = !toggle;
 }
 btnDecimal.removeEventListener("click", clickDecimalOnce, false);
+
 // allow decimal to be pressed only once
 btnDecimal.addEventListener("click", () => {
   clickDecimalOnce();
@@ -157,15 +159,14 @@ allBtn.forEach((btn) => {
       console.log({ operatorCount });
       operator = val;
       displayPersist(operator);
+      cacheOperatorsArray.push(operator);
       cacheDigitsArray.push(operator); // FIXME maybe make it a json object with titles
     }
     if (val === "=") return;
     data = parseFloat(val);
 
-    // TODO When AC or C is pressed rest inputCount to
     if (inputCount > 0) {
       x = parseFloat(valString.trim());
-      // displayPersist(valString);
     }
 
     if (!x || x.toString().length < 1) {
@@ -198,7 +199,7 @@ allBtn.forEach((btn) => {
 
 if (data === undefined) throw new Error("Invalid data");
 
-// ////////////////LOGIC/////////////////////////////////////////
+// ////////////////LOGIC///////////////
 function operateSwitch(
   l: number,
   m: number,
@@ -229,6 +230,7 @@ function operate() {
 
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
+
   if (!result) result = 0;
 
   valString = result.toString(); // reset valString - so first item is result
@@ -236,15 +238,23 @@ function operate() {
   console.log({ valString });
   if (!outputDisplay.textContent)
     throw new Error("Output display is undefined");
+
   cacheResultsArray.push(outputDisplay.textContent);
+  const xCopy = x;
+  const yCopy = y;
+  const operatorCopy = operator;
   resetValues(x, y, operator);
-  inputHistory.textContent = `Ans = ${valString}`; // FIXME
+
+  inputHistory.textContent = `${xCopy} ${operatorCopy} ${yCopy} = ${valString}`;
+
+  // inputHistory.textContent = `Ans = ${valString}`; // FIXME
+
   savedCurrentOperateHistory = inputHistory.textContent;
   outputDisplay.textContent = valString;
   toggle = false;
   clickDecimalOnce();
   btnGetHistory.style.opacity = "1";
-
+  console.log({ cacheOperatorsArray });
   inputCount += 1; // prepare all inputs to be pushed in next array step
   return { x, y, operator, inputCount };
 }
@@ -252,7 +262,7 @@ function operate() {
 // Calculate result when "=" is entered/clicked
 btnCalculate.addEventListener("click", operate);
 
-// ////////////////END/////////////////////////////////////////
+// ////////////////END///////////////
 
 function disableHideHistoryButton() {
   if (inputArray.length === 0) {
@@ -263,6 +273,7 @@ function disableHideHistoryButton() {
 }
 
 let inputOutputArray: string[] = [];
+
 btnClearArray.forEach((btn) => {
   btn.addEventListener("click", async () => {
     if (btn.value === "AC") {
@@ -271,8 +282,13 @@ btnClearArray.forEach((btn) => {
       countResultsForHistory = 0;
       savedCurrentOperateHistory = "";
       inputOutputArray = [];
+      cacheOperatorsArray = [];
+      cacheDigitsArray = [];
+      cacheResultsArray = [];
       disableHideHistoryButton();
+      console.clear();
     }
+    // AC & C common functionality
     outputDisplay.textContent = "0";
     inputHistory.textContent = "Ans = 0";
     inputCount = 0;
