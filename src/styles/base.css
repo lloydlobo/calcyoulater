@@ -30,7 +30,6 @@ body {
     "main"
     "footer";
   grid-template-rows: auto 1fr auto;
-  width: min(100% - 2rem, 80vw);
   margin-inline: auto;
   min-height: 100vh;
   font-family: var(--font-sans-noto);
@@ -41,7 +40,11 @@ body {
   /* background-color: hsl(228, 26%, 16.68%); */
   /* background-blend-mode: darken; */
 }
-
+@media screen and (min-width: 40em) {
+  body {
+    width: min(100% - 2rem, 80vw);
+  }
+}
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
