@@ -101,17 +101,20 @@ function displayPersist(val: string | number) {
 // ///////////////////////SETUP//////////
 
 let inputCount = 0;
+// let inputCountLast = 0;
 let operatorCount = 0;
 
 let valString = "";
 // START OF GLOBAL VARIABLES
 let x: number | null = null;
 let y: number | null = null;
+let nextNumber: number | null = null;
 let operator: string | null = null;
 let data = 0;
 let inputArray: string[] = [];
 let resultInputArray: string[] = [];
-
+let isReset: boolean;
+const valMap = new Map();
 function equalsIsClicked(val: string) {
   if (val !== "=") return false;
   return true;
@@ -126,9 +129,10 @@ function resetValues(a: number | null, b: number | null, z: string | null) {
   y = null;
   operator = null;
 
-  console.log({ x, y, operator });
-  return [x, y, operator];
+  // return [x, y, operator];
+  return true;
 }
+
 let toggle = true;
 
 function clickDecimalOnce() {
@@ -146,11 +150,22 @@ btnDecimal.addEventListener("click", () => {
   clickDecimalOnce();
 });
 
+const numMap = new Map();
+
 allBtn.forEach((btn) => {
   btn.addEventListener("click", () => {
     const val = btn.value;
+
+    if (isReset) {
+      x = null;
+      y = null;
+      isReset = false;
+    }
+
     if (!equalsIsClicked(val)) {
       valString = valString.concat(val);
+      valMap.set(operatorCount, valString);
+      console.log({ valMap });
       console.log(valString);
     }
     console.log({ inputArray });
@@ -179,25 +194,47 @@ allBtn.forEach((btn) => {
       operatorCount === 0
     ) {
       x = parseFloat(x.toString().concat(val));
+      cacheDigitsArray.push(x);
       console.log({ x_concat: x });
       displayPersist(val);
     }
-
+    numMap.set(inputCount, x);
+    console.log({ numMap_x: numMap });
+    // const currentOperatorCount = operatorCount + 1;
     if (operatorCount > 0 && !operatorIsClicked(val)) {
       if (!y || y.toString().length < 1) {
         y = parseFloat(val);
+        cacheDigitsArray.push(y);
+        nextNumber = y;
+        numMap.set(operatorCount, y);
         displayPersist(val);
       } else if (y.toString().length >= 1) {
-        y = parseFloat(y.toString().concat(val));
+        if (!nextNumber) {
+          throw new Error("Number must be defined");
+        }
+        // y = parseFloat(y.toString().concat(val));
+        console.log({ nextNumber });
+        y = parseFloat(nextNumber.toString().concat(val)); // FIXME splice val from nextNumber
+        numMap.set(operatorCount, y);
+
         displayPersist(val);
+        cacheDigitsArray.push(y);
       }
     }
-
+    // numMap.set(inputCount, y);
+    console.log({ numMap });
+    console.log({ cacheDigitsArray });
     console.log({ x, y, operator });
   });
 });
 
 if (data === undefined) throw new Error("Invalid data");
+
+/**
+ * 1. Need 3 arrays to capture number, operator, and result
+ * 2. the numbers one can be a json object too?
+ *
+ */
 
 // ////////////////LOGIC///////////////
 function operateSwitch(
@@ -218,19 +255,91 @@ function operateSwitch(
   if (operatorType === "-") {
     result = l - m;
   }
+  isReset = resetValues(x, y, operator);
   return result;
 }
 
 let savedCurrentOperateHistory = "";
 let countResultsForHistory = 0;
 
-function operate() {
-  console.log({ inputArray });
-  inputArray.push(valString);
+function isOperator(item: any): boolean {
+  return item === "+" || item === "-" || item === "*" || item === "÷";
+}
+function isANumberOnly(item: any): boolean {
+  return (
+    typeof parseFloat(item) === "number" && !isOperator(item) && item !== ""
+  );
+}
+const numItemMap = new Map();
+const operaItemMap = new Map();
 
+function operatePrevCurr(a: number, b: number, op: string): number {
+  let res = 0;
+  if (a && b === 0 && op === "÷") return res; // a/b or 1/0 is reserved
+  if (op === "÷") res = a / b;
+  if (op === "*") res = a * b;
+  if (op === "+") res = a + b;
+  if (op === "-") res = a - b;
+  console.log({ a, op, b, res });
+  return res * 1;
+}
+
+function operateMap() {
+  const dataMap = valMap;
+  const lastData = dataMap.get(operatorCount);
+  // FIXME regex - find all operators "÷", "*", "+", "-"
+  const regExpNumAndOperator = /(\d*\.\d+|\d+\.\d*|\d+)/gm;
+  const dataArr = lastData.split(regExpNumAndOperator);
+  for (let i = 1; i < dataArr.length - 1; i += 1) {
+    const item = dataArr[i];
+
+    if (isANumberOnly(item)) {
+      numItemMap.set(i, item);
+    }
+    if (isOperator(item)) {
+      operaItemMap.set(i, item);
+    }
+  } // end of for loop
+
+  let prev: number;
+  let curr: number;
+  let next;
+  let currOp;
+
+  for (let i = 1; i <= numItemMap.size * 2 - 3; i += 2) {
+    const nextIndexIsEven = (i + 1) % 2 === 0;
+    if (nextIndexIsEven) {
+      currOp = operaItemMap.get(i + 1) as string;
+    }
+    const currIndexIsEven = i % 2 === 0;
+    if (!currIndexIsEven && i <= numItemMap.size * 2 - 1) {
+      if (i === 1) {
+        prev = parseFloat(numItemMap.get(i));
+        curr = parseFloat(numItemMap.get(i + 2));
+        next = operatePrevCurr(prev, curr, currOp as string) as number;
+      }
+      if (i > 1) {
+        if (!next || next.toString().length < 1) {
+          throw new Error("Next: Invalid number");
+        }
+        prev = next;
+        curr = parseFloat(numItemMap.get(i + 2));
+        next = operatePrevCurr(prev, curr, currOp as string) as number;
+      }
+    }
+  }
+  outputDisplay.textContent = "";
+  if (!next) throw new Error("next number not found ");
+  outputDisplay.textContent = next.toFixed(2).toString();
+  return next as number;
+}
+
+function operate() {
+  operateMap();
+
+  inputArray.push(valString);
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
-
   if (!result) result = 0;
 
   valString = result.toString(); // reset valString - so first item is result
@@ -238,19 +347,15 @@ function operate() {
   console.log({ valString });
   if (!outputDisplay.textContent)
     throw new Error("Output display is undefined");
-
-  cacheResultsArray.push(outputDisplay.textContent);
+  cacheResultsArray.push(outputDisplay.textContent); // FIXME mixed ui & business logic
   const xCopy = x;
   const yCopy = y;
   const operatorCopy = operator;
   resetValues(x, y, operator);
-
   inputHistory.textContent = `${xCopy} ${operatorCopy} ${yCopy} = ${valString}`;
-
-  // inputHistory.textContent = `Ans = ${valString}`; // FIXME
-
   savedCurrentOperateHistory = inputHistory.textContent;
-  outputDisplay.textContent = valString;
+  // outputDisplay.textContent = valString; //FIXME latest bug fix
+
   toggle = false;
   clickDecimalOnce();
   btnGetHistory.style.opacity = "1";
