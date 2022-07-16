@@ -262,8 +262,13 @@ function operateSwitch(
 let savedCurrentOperateHistory = "";
 let countResultsForHistory = 0;
 
-function isOperator(item: any) {
+function isOperator(item: any): boolean {
   return item === "+" || item === "-" || item === "*" || item === "÷";
+}
+function isANumberOnly(item: any): boolean {
+  return (
+    typeof parseFloat(item) === "number" && !isOperator(item) && item !== ""
+  );
 }
 const numItemMap = new Map();
 const operaItemMap = new Map();
@@ -275,74 +280,63 @@ function operatePrevCurr(a: number, b: number, op: string): number {
   if (op === "*") res = a * b;
   if (op === "+") res = a + b;
   if (op === "-") res = a - b;
-  return parseFloat(res.toExponential(2));
+  console.log({ a, op, b, res });
+  return res * 1;
 }
+
 function operateMap() {
   const dataMap = valMap;
   const lastData = dataMap.get(operatorCount);
-  // const regExpNumOnly = /[0-8]/gm;
-  const regExpNumAndOperator = /[+-]?(\d*\.\d+|\d+\.\d*|\d+)/gm; // gm -> global & multiline
+  // FIXME regex - find all operators "÷", "*", "+", "-"
+  const regExpNumAndOperator = /(\d*\.\d+|\d+\.\d*|\d+)/gm;
   const dataArr = lastData.split(regExpNumAndOperator);
   for (let i = 1; i < dataArr.length - 1; i += 1) {
     const item = dataArr[i];
-    if (
-      typeof parseFloat(item) === "number" &&
-      !isOperator(item) &&
-      item !== ""
-    ) {
-      const num = item;
-      numItemMap.set(i, num);
-      console.log("item", num);
+
+    if (isANumberOnly(item)) {
+      numItemMap.set(i, item);
     }
     if (isOperator(item)) {
-      const opera = item;
-      operaItemMap.set(i, opera);
-      console.log("operator", opera);
+      operaItemMap.set(i, item);
     }
-  }
-  // TODO get the opera from operaMap
-  /**
-   * Map(5) {1 => '66', 3 => '99', 5 => '88', 7 => '2', 9 => '1'}
-   * Map(4) {2 => '*', 4 => '÷', 6 => '*', 8 => '÷'}
-   * */
-  console.log(numItemMap, operaItemMap);
-  let prev;
-  let curr;
+  } // end of for loop
+
+  let prev: number;
+  let curr: number;
   let next;
-  // let prevOp;
   let currOp;
-  // let nextOp;
-  for (let i = 1; i < numItemMap.size + 2; i += 2) {
-    // prevOp = operaItemMap.get(i + 1);
-    currOp = operaItemMap.get(i + 1);
-    console.log({ currOp });
-    // nextOp = operaItemMap.get(i + 5);
-    if (i % 2 !== 0) {
+
+  for (let i = 1; i <= numItemMap.size * 2 - 3; i += 2) {
+    const nextIndexIsEven = (i + 1) % 2 === 0;
+    if (nextIndexIsEven) {
+      currOp = operaItemMap.get(i + 1) as string;
+    }
+    const currIndexIsEven = i % 2 === 0;
+    if (!currIndexIsEven && i <= numItemMap.size * 2 - 1) {
       if (i === 1) {
         prev = parseFloat(numItemMap.get(i));
         curr = parseFloat(numItemMap.get(i + 2));
-        next = operatePrevCurr(prev, curr, currOp);
+        next = operatePrevCurr(prev, curr, currOp as string) as number;
       }
       if (i > 1) {
-        if (!next) throw new Error("Next: Invalid number");
+        if (!next || next.toString().length < 1) {
+          throw new Error("Next: Invalid number");
+        }
         prev = next;
         curr = parseFloat(numItemMap.get(i + 2));
-        next = operatePrevCurr(prev, curr, currOp);
+        next = operatePrevCurr(prev, curr, currOp as string) as number;
       }
     }
-    console.log({ prev, currOp, curr, next });
   }
-  console.log({ dataMap, lastData, dataArr });
-
   outputDisplay.textContent = "";
   if (!next) throw new Error("next number not found ");
-  outputDisplay.textContent = next.toString();
+  outputDisplay.textContent = next.toFixed(2).toString();
   return next as number;
 }
 
 function operate() {
   operateMap();
-  console.log({ inputArray });
+
   inputArray.push(valString);
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
@@ -358,9 +352,7 @@ function operate() {
   const yCopy = y;
   const operatorCopy = operator;
   resetValues(x, y, operator);
-
   inputHistory.textContent = `${xCopy} ${operatorCopy} ${yCopy} = ${valString}`;
-
   savedCurrentOperateHistory = inputHistory.textContent;
   // outputDisplay.textContent = valString; //FIXME latest bug fix
 
