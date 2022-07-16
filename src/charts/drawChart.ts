@@ -32,7 +32,7 @@ async function lodashSortData(DATA: any[], sortBy: string) {
   let category = "";
 
   //  newSortType = sortType;
-  console.log({ newSortType: sortBy });
+  // console.log({ newSortType: sortBy });
   switch (sortBy) {
     case "value": {
       category = "value";
@@ -63,7 +63,9 @@ export async function drawChart(DATA: any[], newSort: string) {
 
   const d3Container = d3.select("#d3").classed("container-d3", true);
 
-  const d3Bars = d3Container
+  // const d3Bars =...
+  // eslint-disable-next-line no-unused-vars
+  d3Container
     .selectAll(".bar")
     .data(cheerioData)
     .enter()
@@ -73,7 +75,7 @@ export async function drawChart(DATA: any[], newSort: string) {
     .attr("height", (data) => 200 - yScale(data.value))
     .attr("x", (data) => xScale(data.coin) as number)
     .attr("y", (data) => yScale(data.value));
-  console.log("file: drawChart.ts | line 37 | drawChart | d3Bars", d3Bars);
+  // console.log("file: drawChart.ts | line 37 | drawChart | d3Bars", d3Bars);
 
   // setTimeout(() => {
   //   d3Bars.data(DUMMY_DATA.slice(0, 2)).exit().remove(); // exit opposite of enter & remove from DOM
@@ -137,7 +139,7 @@ export const dataFetch = fetch(url)
 
 btnD3Category.addEventListener("click", async () => {
   const changeSort = await changeType();
-  console.log("click", sortBy);
+  // console.log("click", sortBy);
   const res = await lodashSortData(d3Array, changeSort);
   await drawChart(res, changeSort);
 });

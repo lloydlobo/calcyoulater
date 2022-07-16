@@ -39,7 +39,6 @@ const btnCalculate = document.getElementById(
 ) as HTMLButtonElement;
 
 export const inputHistory = document.querySelector("#inputHistory") as any;
-let cacheResultsArray: string[] = [];
 let cacheDigitsArray: (string | number)[] = [];
 let cacheOperatorsArray: string[] = [];
 
@@ -114,7 +113,7 @@ let data = 0;
 let inputArray: string[] = [];
 let resultInputArray: string[] = [];
 let isReset: boolean;
-const valMap = new Map();
+let valMap = new Map();
 function equalsIsClicked(val: string) {
   if (val !== "=") return false;
   return true;
@@ -284,12 +283,16 @@ function operatePrevCurr(a: number, b: number, op: string): number {
   return res * 1;
 }
 
+let prev: number;
+let curr: number;
+let next: number;
+let currOp: string;
 function operateMap() {
   const dataMap = valMap;
   const lastData = dataMap.get(operatorCount);
-  // FIXME regex - find all operators "÷", "*", "+", "-"
   const regExpNumAndOperator = /(\d*\.\d+|\d+\.\d*|\d+)/gm;
   const dataArr = lastData.split(regExpNumAndOperator);
+
   for (let i = 1; i < dataArr.length - 1; i += 1) {
     const item = dataArr[i];
 
@@ -300,11 +303,6 @@ function operateMap() {
       operaItemMap.set(i, item);
     }
   } // end of for loop
-
-  let prev: number;
-  let curr: number;
-  let next;
-  let currOp;
 
   for (let i = 1; i <= numItemMap.size * 2 - 3; i += 2) {
     const nextIndexIsEven = (i + 1) % 2 === 0;
@@ -329,39 +327,20 @@ function operateMap() {
     }
   }
   outputDisplay.textContent = "";
+  console.log(next);
   if (!next) throw new Error("next number not found ");
-  outputDisplay.textContent = next.toFixed(2).toString();
+  outputDisplay.textContent = next!.toFixed(2).toString();
   return next as number;
 }
 
 function operate() {
   operateMap();
-
+  valString = "";
+  valMap = new Map();
   inputArray.push(valString);
   if (!x || !y || !operator) throw new Error("Invalid data");
   let result = operateSwitch(x, y, operator);
   if (!result) result = 0;
-
-  valString = result.toString(); // reset valString - so first item is result
-  resultInputArray.push(valString);
-  console.log({ valString });
-  if (!outputDisplay.textContent)
-    throw new Error("Output display is undefined");
-  cacheResultsArray.push(outputDisplay.textContent); // FIXME mixed ui & business logic
-  const xCopy = x;
-  const yCopy = y;
-  const operatorCopy = operator;
-  resetValues(x, y, operator);
-  inputHistory.textContent = `${xCopy} ${operatorCopy} ${yCopy} = ${valString}`;
-  savedCurrentOperateHistory = inputHistory.textContent;
-  // outputDisplay.textContent = valString; //FIXME latest bug fix
-
-  toggle = false;
-  clickDecimalOnce();
-  btnGetHistory.style.opacity = "1";
-  console.log({ cacheOperatorsArray });
-  inputCount += 1; // prepare all inputs to be pushed in next array step
-  return { x, y, operator, inputCount };
 }
 
 // Calculate result when "=" is entered/clicked
@@ -389,7 +368,6 @@ btnClearArray.forEach((btn) => {
       inputOutputArray = [];
       cacheOperatorsArray = [];
       cacheDigitsArray = [];
-      cacheResultsArray = [];
       disableHideHistoryButton();
       console.clear();
     }
