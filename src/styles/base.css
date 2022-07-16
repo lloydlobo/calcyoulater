@@ -35,8 +35,11 @@ body {
   min-height: 100vh;
   font-family: var(--font-sans-noto);
   color: white;
-  background-color: #e8e7ec;
-  backdrop-filter: blur(3.28px);
+  /* background-color: #e8e7ec; */
+  /* backdrop-filter: blur(3.28px); */
+  /* keypad color */
+  /* background-color: hsl(228, 26%, 16.68%); */
+  /* background-blend-mode: darken; */
 }
 
 #app {

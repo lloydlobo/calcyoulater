@@ -13,16 +13,40 @@
 
     <!-- <script defer src="https://d3js.org/d3.v7.min.js"></script> -->
 
-    <title>Vite App</title>
+    <title>Cryptculator</title>
   </head>
 
-  <body id="body" class="shadow-xl sm:w-3/5">
+  <body
+    id="body"
+    class="bg-slate-600 antialiased shadow-xl dark:bg-slate-900 sm:w-3/5"
+  >
     <header class="header mt-8 flex items-center rounded-t-3xl px-8 py-8">
+      <!-- Tailwind css -->
+      <div
+        class="pointer-events-none absolute inset-x-0 left-0 top-0 z-20 flex justify-center overflow-hidden"
+      >
+        <div class="flex w-[120rem] flex-none justify-end">
+          <picture
+            ><source srcset="/src/images/tw-grad-1.avif" type="image/avif" />
+            <img
+              src="/src/images/tw-grad-2.avif"
+              alt=""
+              class="w-[80rem] max-w-none flex-none animate-pulse dark:hidden" /></picture
+          ><picture
+            ><source srcset="/src/images/tw-grad-3.avif" type="image/avif" />
+            <img
+              src="/src/images/tw-grad-4.avif"
+              alt=""
+              class="hidden w-[92rem] max-w-none flex-none scale-150 animate-pulse antialiased opacity-60 filter duration-1000 ease-in-out dark:block"
+          /></picture>
+        </div>
+      </div>
+      <!-- NAV -->
       <nav class="navbar navbar-main flex w-full items-center justify-between">
         <div
           class="logo mr-auto text-sm font-bold uppercase leading-none tracking-wider sm:text-xl"
         >
-          calcyoulater
+          Cryptculator
         </div>
 
         <div class="social">
