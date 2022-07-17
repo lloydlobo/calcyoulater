@@ -34,6 +34,7 @@ const btnAll: HTMLButtonElement[] = Array.from(
 );
 
 const MAP_BTN_CACHE = new Map();
+
 for (let i = 0; i < btnAll.length; i += 1) {
   MAP_BTN_CACHE.set(i, btnAll[i]);
 }
@@ -90,6 +91,7 @@ const MAIN_CACHE = {
   MAP_DATA: new Map(),
   MAP_NUMBERS: new Map<number, number>(),
   MAP_OPERATOR: new Map<number, string>(),
+  MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
 };
 
 function isNumAndOperator(btn: HTMLButtonElement) {
@@ -110,6 +112,10 @@ function isNumAndOperator(btn: HTMLButtonElement) {
 function handleAllBtn(btn: HTMLButtonElement, clickCountBtn: number) {
   const val = btn.value;
   const count = clickCountBtn;
+
+  const prevValIsAlsoPeriod = val === '.' && MAIN_CACHE.MAP_VALUES_HANDLE.get(count - 1) === '.' && count > 0;
+
+  if (prevValIsAlsoPeriod) return;
   const currVal = MAIN_CACHE.MAP_VALUES_HANDLE.set(count, val);
   return currVal;
 }
@@ -156,38 +162,71 @@ function requestToOperate() {
 function mainHubNumOp(btn: HTMLButtonElement) {
   // #1 Handle & Filter Numbers
   const getHandleValAndCount = handleAllBtn(btn, MAIN_CACHE.clickCountNumAndOpBtn); // prettier-ignore
+  if (!getHandleValAndCount) return
   const getFilteredNumOpArr = filterBtnInputs(getHandleValAndCount);
-  // console.log("file: main.ts | line 159 | mainHubNumOp | getFilteredNumOpArr", getFilteredNumOpArr);
+  console.log("file: main.ts | line 159 | mainHubNumOp | getFilteredNumOpArr", getFilteredNumOpArr);
 
-  // #2 Calculate Numbers
-  if (!getFilteredNumOpArr) throw new Error("string, num not found");
+  if (!getFilteredNumOpArr) throw new Error("string, num not found or invalid or undefined");
+
+  // #2 Update count for num & op
   if (isOperator(getFilteredNumOpArr[1])) MAIN_CACHE.countFilterOperators += 1; // prettier-ignore
   // const resOperators = getOperators(MAP_OPERATOR);
   else MAIN_CACHE.countFilterNumbers += 1;
   // const resNumbers = getNumbers(MAP_NUMBERS);
 
+
   MAIN_CACHE.clickCountNumAndOpBtn += 1;
+
   return getFilteredNumOpArr; // this is enough. calculate in an async function separately
 }
-// MAIN_CACHE.MAP_DATA.set(MAIN_CACHE.countMainHub, [resNumbers, resOperators]);
+
+// #2 Populate Numbers & Operators in Cache
+function populateDataInCache(getFilteredNumOpArr: (string | number)[] | undefined) {
+  if (!getFilteredNumOpArr)
+    throw new Error("string, num not found");
+  const currCount = MAIN_CACHE.clickCountNumAndOpBtn;
+  MAIN_CACHE.MAP_DATA.set(currCount, getFilteredNumOpArr[1]);
+}
+
+function updateDisplay(currNumOp: (string | number)[] | undefined) {
+  if (!currNumOp) throw new Error("Cannot find mainHubNumOp result");
+  outputDisplay.innerText =
+    outputDisplay.innerText.toString().trimEnd()
+    +
+    (currNumOp[1]).toString();
+}
+
+function compute() {
+  const len = MAIN_CACHE.MAP_DATA.size;
+  console.log("compute", { len }, (MAIN_CACHE.MAP_DATA))
+
+}
 
 // ////////////// BTN EVENT LISTEN /////////////
 for (let i = 0; i < MAP_BTN_CACHE.size; i += 1) {
   const currBtn = MAP_BTN_CACHE.get(i);
-  if (isNumAndOperator(currBtn)) {
+  if (isNumAndOperator(currBtn) || currBtn.value === '.') {
     MAP_BTN_CACHE.get(i).addEventListener("click", () => {
       const clickedBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
-      mainHubNumOp(clickedBtn);
+
+      // MAIN ENTRYPOINT
+      const currNumOp = mainHubNumOp(clickedBtn);
+      if (!currNumOp) throw new Error(currNumOp + ' is not found""');
+      populateDataInCache(currNumOp);
+
+      // DOM UI CLIENT STUFF
+      if (!currNumOp) throw new Error("Cannot find mainHubNumOp() result");
+      updateDisplay(currNumOp);
     });
   } else {
     const clickedUtilBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
-    const MAP_BTN_UTIL_CACHE = new Map();
-    MAP_BTN_UTIL_CACHE.set(i, clickedUtilBtn);
+
+    MAIN_CACHE.MAP_BTN_UTIL_CACHE.set(i, clickedUtilBtn);
   }
 } // FIXME filter out clear buttons
 
 // Calculate result when "=" is entered/clicked
-btnCalculate.addEventListener("click", requestToOperate);
+btnCalculate.addEventListener("click", compute);
 
 // // EVENT LISTENERS //
 // FIXME duplicate clear buttons btnClear & btnBackspaceClear
@@ -214,18 +253,19 @@ btnGetHistory.addEventListener("click", () => {
   // eslint-disable-next-line no-console
   console.log("gtHist");
 });
-btnDecimal.removeEventListener(
-  "click",
-  () => {
-    // eslint-disable-next-line no-console
-    console.log(";remove");
-  },
-  false
-);
-btnDecimal.addEventListener("click", () => {
-  // eslint-disable-next-line no-console
-  console.log("addDecimal");
-});
+
+// btnDecimal.removeEventListener(
+//   "click",
+//   () => {
+//     // eslint-disable-next-line no-console
+//     console.log(";remove");
+//   },
+//   false
+// );
+// btnDecimal.addEventListener("click", () => {
+//   // eslint-disable-next-line no-console
+//   console.log("addDecimal");
+// });
 
 // //// END OF SCRIPT ////
 
