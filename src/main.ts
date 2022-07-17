@@ -199,7 +199,22 @@ function updateDisplay(currNumOp: (string | number)[] | undefined) {
 function compute() {
   const len = MAIN_CACHE.MAP_DATA.size;
   console.log("compute", { len }, (MAIN_CACHE.MAP_DATA))
-
+  let prev;
+  let curr;
+  let next;
+  let arrData = [];
+  const data = MAIN_CACHE.MAP_DATA
+  console.log({ data })
+  prev = data.get(1);
+  arrData.push(prev);
+  for (let i = 2; i <= len; i += 2) {
+    curr = data.get(i);
+    next = data.get(i + 1)
+    console.log({ prev, curr, next, data })
+    arrData.push(curr, next)
+  }
+  console.log(arrData)
+  return [prev, curr, data, arrData]
 }
 
 // ////////////// BTN EVENT LISTEN /////////////
