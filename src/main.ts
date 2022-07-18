@@ -71,7 +71,7 @@ const drawCanvas = () => animateCanvas(1000, 1000);
 drawCanvas();
 
 // ////////////////LOGIC///////////////
-const DATA = {
+const STATE = {
   countBtnClick: 0,
   MAP_VALUES_HANDLE: new Map(),
   MAP_FILTER_NUM: new Map(),
@@ -83,25 +83,21 @@ const DATA = {
   countOperator: 0,
   markerOperator: 0,
   isBackspace: false,
-  MAP_DATA: new Map<number, string | number>(),
+  MAP_DATA: new Map<number, string | number>(), // TODO Reset this after calculation result is fetched
   MAP_NUMBERS: new Map<number, number>(),
   MAP_OPERATOR: new Map<number, string>(),
   MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
   strPrevCopy: "",
+  resultCache: 0,
   result: 0,
+  countCompute: 0,
 };
 
 const REGEX = {
-  numberDigitOnly: /([0-9])/gm,
-  operandsOnly: /(-|÷|\+|\*)/gm,
+  regexIsNumber: /([0-9])/gm,
+  regexIsOperands: /(-|÷|\+|\*)/gm,
   operandPositiveLookbehind: /.(?<=(-|÷|\*|\+))/, // gets all the operators groups
 };
-
-/* 
-
-/.(?<=(-|÷|\*|\+))/gm
-/(-|÷|\*|\+)/gm 
-*/
 
 export const operatorIsClicked = (val: string) =>
   val === "-" || val === "+" || val === "*" || val === "÷";
@@ -123,10 +119,10 @@ function isNumAndOperator(btn: HTMLButtonElement) {
 const prevValIsAlsoOperator = (value: string, count: number): boolean =>
   count > 0 &&
   isOperator(value) &&
-  isOperator(DATA.MAP_VALUES_HANDLE.get(count - 1));
+  isOperator(STATE.MAP_VALUES_HANDLE.get(count - 1));
 
 const prevValIsAlsoPeriod = (val: string, count: number): boolean =>
-  val === "." && count > 0 && DATA.MAP_VALUES_HANDLE.get(count - 1) === ".";
+  val === "." && count > 0 && STATE.MAP_VALUES_HANDLE.get(count - 1) === ".";
 
 function handleAllBtn(
   btn: HTMLButtonElement,
@@ -136,7 +132,7 @@ function handleAllBtn(
   const count = clickCountBtn;
   if (prevValIsAlsoOperator(val, count)) return undefined;
   if (prevValIsAlsoPeriod(val, count)) return undefined;
-  const currVal = DATA.MAP_VALUES_HANDLE.set(count, val);
+  const currVal = STATE.MAP_VALUES_HANDLE.set(count, val);
 
   return currVal;
 }
@@ -148,66 +144,31 @@ function filterBtnInputs(
   let currOp;
   let currNum;
   let result;
-  const currData: string = fetchDataMap.get(DATA.countBtnClick);
+  const currData: string = fetchDataMap.get(STATE.countBtnClick);
   if (typeof parseFloat(currData) === "number") {
-    const currCount = DATA.countFilterNumbers;
+    const currCount = STATE.countFilterNumbers;
     currNum = currData;
-    // DATA.MAP_FILTER_NUM.set(currCount, currNum);
     result = [currCount, currNum];
   }
   if (isOperator(currData)) {
-    const currCount = DATA.countFilterOperators;
+    const currCount = STATE.countFilterOperators;
     currOp = currData;
-    // DATA.MAP_FILTER_OP.set(currCount, currOp);
     result = [currCount, currOp];
   }
 
   return result;
 }
 
-function handleCacheDataFilterMap(getValidNumAndOp: Map<any, any>): void {
-  const currData: string = getValidNumAndOp.get(DATA.countBtnClick);
+function handleHubMapFilterState(getValidNumAndOp: Map<any, any>): void {
+  const currData: string = getValidNumAndOp.get(STATE.countBtnClick);
   if (typeof parseFloat(currData) === "number") {
-    const currCount = DATA.countFilterNumbers;
-    DATA.MAP_FILTER_NUM.set(currCount, currData);
+    const currCount = STATE.countFilterNumbers;
+    STATE.MAP_FILTER_NUM.set(currCount, currData);
   }
   if (isOperator(currData)) {
-    const currCount = DATA.countFilterOperators;
-    DATA.MAP_FILTER_OP.set(currCount, currCount);
+    const currCount = STATE.countFilterOperators;
+    STATE.MAP_FILTER_OP.set(currCount, currCount);
   }
-}
-
-// Populate Numbers & Operators in Cache
-function populateDataInCache(
-  getFilteredNumOpArr: (string | number)[] | undefined
-): void {
-  if (!getFilteredNumOpArr) throw new Error("string, num not found");
-  const currCount = DATA.countBtnClick;
-  DATA.MAP_DATA.set(currCount, getFilteredNumOpArr[1]);
-}
-
-// //// CENTRAL HUB FOR ALL PROCESSING ////
-function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
-  // #1 Handle & Filter Numbers
-  const getValidNumAndOp = handleAllBtn(btn, DATA.countBtnClick);
-  if (!getValidNumAndOp) return undefined;
-  const getFilteredNumOpArr = filterBtnInputs(getValidNumAndOp);
-  if (!getFilteredNumOpArr) throw new Error("undefined");
-
-  // #! Set DATA
-  handleCacheDataFilterMap(getValidNumAndOp);
-
-  // #2 Update count for num & op
-  if (isOperator(getFilteredNumOpArr[1])) DATA.countFilterOperators += 1;
-  else DATA.countFilterNumbers += 1;
-  DATA.countBtnClick += 1;
-
-  // #3 Populate Numbers & Operators in Cache
-  const currNumOp = getFilteredNumOpArr;
-  if (!currNumOp) throw new Error(`${currNumOp} is not found""`);
-  populateDataInCache(currNumOp);
-
-  return getFilteredNumOpArr; // this is enough. calculate rest in an async function
 }
 
 function updateDisplay(currNumOp: (string | number)[] | undefined) {
@@ -219,101 +180,143 @@ function updateDisplay(currNumOp: (string | number)[] | undefined) {
 function flattenDataMapCache(mappedData: Map<number, string | number>) {
   const arrData: (string | number)[] = [];
   const data: Map<number, string | number> = mappedData;
-  if (!data) throw new Error();
+  // eslint-disable-next-line no-console
+  console.log("mappedData flatten", mappedData);
+  // if (!data) throw new Error();
   for (let i = 1; i <= data.size; i += 1) {
     const currData = data.get(i);
     if (!currData) throw new Error();
     arrData.push(currData);
   } // end of for loop
-  if (!arrData.filter((item) => (typeof item === "undefined") as boolean)) {
+  if (!arrData.filter((item) => (typeof item === "undefined") as boolean))
     throw new Error("arrData has an undefined item");
-  }
 
   return { data, arrData };
 }
+function itemExists(item: string): unknown {
+  return item !== " " && item !== "";
+}
 
-function compute() {
-  // #1 Flatten Map to Array
-  const mappedData = DATA.MAP_DATA;
-  const { data, arrData } = flattenDataMapCache(mappedData);
-  // #2 Convert Array to a string
-  const arrDataCopy = arrData; // (7) ['2', '2', '3', '3', '+', '6', '6']
-  const strJoinArrData = arrDataCopy.join("").trim(); // '2233+66'
-  // #3 Group up strings separated by operand
-  const regexIsNumber = REGEX.numberDigitOnly;
-  const regexIsOperands = REGEX.operandsOnly; // Learn RegEx in 20 minutes --> WebDevSimplified
-  // const isNumber = regexIsNumber.test(strJoinArrData);
-  // const isOperand = regexIsOperands.test(strJoinArrData);
-  const numbersFromString = strJoinArrData.replace(regexIsOperands, " ");
-  const operandsFromString = strJoinArrData.replace(regexIsNumber, " ");
-  const arrNumbers = numbersFromString.split(" ");
-  const arrOperands = operandsFromString
-    .split(" ")
-    .filter((item) => item !== " " && item !== "");
+// //// CENTRAL HUB FOR ALL PROCESSING ////
+function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
   // eslint-disable-next-line no-console
-  console.log({ arrNumbers, arrOperands, numbersFromString, operandsFromString, }); // prettier-ignore
+  console.log("mainHub state-compute", STATE.countCompute);
 
-  // #4 Allocate num & operator from arrays to prev & curr & operator
-  let strPrev = arrNumbers[0];
-  DATA.strPrevCopy = strPrev; // TODO Remember to reset this value on AC (ALL CLEAR)
-  if (strPrev !== DATA.strPrevCopy) {
-    if (!DATA.result) throw new Error("DATA.result is undefined");
-    strPrev = DATA.result.toString();
-  }
-  // Set first result in array to first number
-  DATA.result = parseFloat(strPrev);
+  // #1 Handle & Filter Numbers
+  const getValidNumAndOp = handleAllBtn(btn, STATE.countBtnClick);
+  if (!getValidNumAndOp) return undefined;
+  const getFilteredNumOpArr = filterBtnInputs(getValidNumAndOp);
+  if (!getFilteredNumOpArr) throw new Error("undefined");
+  handleHubMapFilterState(getValidNumAndOp); // #! Set DATA
+  // #2 Update count for num & op
+  if (isOperator(getFilteredNumOpArr[1])) STATE.countFilterOperators += 1;
+  else STATE.countFilterNumbers += 1;
+  // FIXME change state before return --> fix prevNum for loop i = 0 then
+  STATE.countBtnClick += 1; // Increment count
+  // #3 Populate Numbers & Operators in Cache
+  STATE.MAP_DATA.set(STATE.countBtnClick, getFilteredNumOpArr[1]);
 
-  let result;
+  return getFilteredNumOpArr; // this is enough. calculate rest in an async function
+}
+
+function computeLoop(
+  arrNumbers: string[],
+  arrOperands: string[],
+  floatPrev: number,
+  result: any
+) {
+  let res = result;
+
+  // eslint-disable-next-line no-console
+  console.log("computeLoop()", { arrNumbers, arrOperands, floatPrev, res });
   let strCurr;
-  let strOperand;
-  const floatPrev = parseFloat(strPrev);
   let floatCurr;
+  let strOperand;
   let strNext;
-  let floatNext;
 
-  // #6 Iterate and get result from array
   for (let i = 1; i < arrNumbers.length; i += 1) {
     strCurr = arrNumbers[i];
     strNext = arrNumbers[i + 1];
 
-    // eslint-disable-next-line no-console
-    console.log({ strPrev, strCurr, strNext });
-
-    if (!strPrev || !strCurr) throw new Error();
-    floatCurr = parseFloat(strCurr);
-    floatNext = parseFloat(strNext);
-
     strOperand = arrOperands[i - 1];
-    if (!strOperand) throw new Error();
-    // eslint-disable-next-line no-console
-    console.log({ strOperand });
+    floatCurr = parseFloat(strCurr);
 
+    if (!strOperand) throw new Error(); // This also blocks any processing when = is pressed
     if (!floatPrev || !floatCurr) throw new Error();
-    if (!floatNext) {
-      result = operatePrevCurr(DATA.result, floatCurr, strOperand);
-    } else {
-      result = operatePrevCurr(DATA.result, floatCurr, strOperand);
-    }
-    if (!result) throw new Error();
-    DATA.result = result;
-  }
 
-  // #5 Cache the result to Global DATA.result cache
+    // #6 Compute Result with each iteration
+    // if (!strNext) // FIXME Enable Or Disable?
+    if (i <= 1) res = operatePrevCurr(floatPrev, floatCurr, strOperand);
+    else res = operatePrevCurr(STATE.resultCache, floatCurr, strOperand);
 
-  // eslint-disable-next-line no-console
-  // console.log({ data, arrData, arrDataCopy, strJoinArrData, result });
-  // eslint-disable-next-line no-console
-  console.log({ result });
+    // eslint-disable-next-line no-console
+    console.log(i, { floatPrev, res, strCurr, strNext, strOperand, floatCurr });
+    // #7 Cache the result to Global DATA.result cache
+    if (!res) throw new Error();
+    STATE.resultCache = res;
+  } // end of for loop
 
-  return [data, arrData, result, arrDataCopy, strJoinArrData];
+  return res;
 }
 
+function compute() {
+  // eslint-disable-next-line no-console
+  console.log("compute is clicked");
+  // #1 Flatten Map to Array
+  const mappedData = STATE.MAP_DATA;
+  // eslint-disable-next-line no-console
+  console.log("mappedData compute", mappedData);
+  const { arrData } = flattenDataMapCache(mappedData);
+  // #2 Convert Array to a string
+  const arrDataCopy = arrData; // (7) ['2', '2', '3', '3', '+', '6', '6']
+  const strJoinArrData = arrDataCopy.join("").trim();
+  const arrNumbers = strJoinArrData
+    .replace(REGEX.regexIsOperands, " ")
+    .split(" ");
+  const arrOperands = strJoinArrData
+    .replace(REGEX.regexIsNumber, " ")
+    .split(" ")
+    .filter((item) => itemExists(item));
+  // eslint-disable-next-line no-console
+  console.log("compute", STATE.countCompute, {
+    strJoinArrData,
+    arrNumbers,
+    arrOperands,
+  });
+  // #4 Allocate num & operator from arrays to prev & curr & operator
+  let strPrev;
+  if (STATE.countCompute > 1) strPrev = STATE.resultCache.toString();
+  else if (STATE.countCompute === 1) strPrev = arrNumbers[0].toString();
+  if (!strPrev) throw new Error();
+
+  const floatPrev = parseFloat(strPrev);
+  let result = floatPrev;
+  // eslint-disable-next-line no-console
+  console.log({ strPrev, floatPrev, result, arrNumbers, arrOperands });
+  // FIXME arrNumbers is the culprit
+  // #5 Iterate and get result from array
+  result = computeLoop(arrNumbers, arrOperands, floatPrev, result); // end of for loop
+  // if (STATE.countCompute === 1) {
+  STATE.MAP_DATA.clear();
+  STATE.countBtnClick = 1;
+  STATE.MAP_DATA.set(1, result);
+  // eslint-disable-next-line no-console
+  console.log("cleared", STATE.MAP_DATA, STATE.MAP_DATA.size);
+  // STATE.MAP_DATA.set(1, STATE.resultCache);
+  // }
+  if (!result) throw new Error();
+  return result;
+}
+
+// TODO Reset the whole arrayNum when calculation is done
 // ////////////// BTN EVENT LISTEN /////////////
 
 for (let i = 0; i < MAP_BTN_CACHE.size; i += 1) {
   const currBtn = MAP_BTN_CACHE.get(i);
   if (isNumAndOperator(currBtn) || currBtn.value === ".") {
     MAP_BTN_CACHE.get(i).addEventListener("click", () => {
+      // eslint-disable-next-line no-console
+      console.log("STATE.MAP_DATA", STATE.MAP_DATA);
       const clickedBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
       // MAIN ENTRYPOINT
       const currNumOp = mainHubNumOp(clickedBtn);
@@ -323,14 +326,24 @@ for (let i = 0; i < MAP_BTN_CACHE.size; i += 1) {
     }); // end of event listener
   } else {
     const clickedUtilBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
-    DATA.MAP_BTN_UTIL_CACHE.set(i, clickedUtilBtn);
+    STATE.MAP_BTN_UTIL_CACHE.set(i, clickedUtilBtn);
   }
 } // end of for loop
 
 // FIXME filter out clear buttons
 
 // Calculate result when "=" is entered/clicked
-btnCalculate.addEventListener("click", compute);
+btnCalculate.addEventListener("click", () => {
+  // #6 RESET STATE so prev mappedData is reset & mainHubNumOp state setting of MAP_DATA is reset
+  STATE.countCompute += 1;
+  const result = compute();
+  if (!result) throw new Error("result not found");
+  // #8 Increment DATA compute counter - fetch the prev val from array then
+  // eslint-disable-next-line no-console
+  console.log({ result });
+
+  STATE.resultCache = result;
+});
 
 // // EVENT LISTENERS //
 // FIXME duplicate clear buttons btnClear & btnBackspaceClear
@@ -343,15 +356,15 @@ btnClearArray.forEach((btn) =>
 
 btnBackspaceClear.addEventListener("click", () => {
   // TODO
-  DATA.isBackspace = true;
+  STATE.isBackspace = true;
   // if isOperator
-  DATA.MAP_FILTER_OP.delete(DATA.countFilterOperators - 1);
-  DATA.countFilterOperators -= 1;
-  DATA.isBackspace = false;
+  STATE.MAP_FILTER_OP.delete(STATE.countFilterOperators - 1);
+  STATE.countFilterOperators -= 1;
+  STATE.isBackspace = false;
   // if isNumber
-  DATA.MAP_FILTER_NUM.delete(DATA.countFilterNumbers - 1);
-  DATA.countFilterNumbers -= 1;
-  DATA.isBackspace = false;
+  STATE.MAP_FILTER_NUM.delete(STATE.countFilterNumbers - 1);
+  STATE.countFilterNumbers -= 1;
+  STATE.isBackspace = false;
 });
 btnGetHistory.addEventListener("click", () => {
   // eslint-disable-next-line no-console
@@ -422,4 +435,9 @@ REPLACE
 1. $1$2$3  (groupings due to ( ... ) in regex)
 
 
+*/
+/* 
+
+/.(?<=(-|÷|\*|\+))/gm
+/(-|÷|\*|\+)/gm 
 */
