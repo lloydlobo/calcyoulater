@@ -91,6 +91,7 @@ const STATE = {
   resultCache: 0,
   result: 0,
   countCompute: 0,
+  capturedDisplayData: "",
 };
 
 const REGEX = {
@@ -175,6 +176,8 @@ function updateDisplay(currNumOp: (string | number)[] | undefined) {
   if (!currNumOp) throw new Error("Cannot find mainHubNumOp result");
   outputDisplay.innerText =
     outputDisplay.innerText.toString().trimEnd() + currNumOp[1].toString();
+  const captureDisplayData = outputDisplay.innerText;
+  STATE.capturedDisplayData = captureDisplayData;
 }
 
 function flattenDataMapCache(mappedData: Map<number, string | number>) {
@@ -330,8 +333,12 @@ for (let i = 0; i < MAP_BTN_CACHE.size; i += 1) {
   }
 } // end of for loop
 
-// FIXME filter out clear buttons
-
+function displayResult() {
+  outputDisplay.innerText = STATE.resultCache.toFixed(2).toString();
+}
+function displayHistory() {
+  inputHistory.innerText = STATE.capturedDisplayData.trim();
+}
 // Calculate result when "=" is entered/clicked
 btnCalculate.addEventListener("click", () => {
   // #6 RESET STATE so prev mappedData is reset & mainHubNumOp state setting of MAP_DATA is reset
@@ -343,6 +350,9 @@ btnCalculate.addEventListener("click", () => {
   console.log({ result });
 
   STATE.resultCache = result;
+
+  displayResult();
+  displayHistory();
 });
 
 // // EVENT LISTENERS //
