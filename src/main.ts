@@ -94,11 +94,11 @@ const STATE = {
   capturedDisplayData: "",
 };
 
-// FIXME REGEX "panics" when numbers have decimals in them ==> strOperand: "."
+// FIXME REGEX "panics" when numbers have decimals in them ==> strOperator: "."
 const REGEX = {
   regexIsNumber: /([0-9])/gm,
-  regexIsOperands: /(-|÷|\+|\*)/gm,
-  operandPositiveLookbehind: /.(?<=(-|÷|\*|\+))/, // gets all the operators groups
+  regexIsOperator: /(-|÷|\+|\*)/gm,
+  regexIsOperatorPositiveLookbehind: /.(?<=(-|÷|\*|\+))/, // gets all the operators groups
 };
 
 export const operatorIsClicked = (val: string) =>
@@ -223,29 +223,36 @@ function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
 
 function computeLoop(
   arrNumbers: string[],
-  arrOperands: string[],
+  arrOperators: string[],
   floatPrev: number,
   result: any
 ) {
   let res = result;
   // eslint-disable-next-line no-console
-  console.log("computeLoop()", { arrNumbers, arrOperands, floatPrev, res });
+  console.log("computeLoop()", { arrNumbers, arrOperators, floatPrev, res });
   let strCurr;
   let floatCurr;
-  let strOperand;
+  let strOperator;
   let strNext;
   for (let i = 1; i < arrNumbers.length; i += 1) {
     strCurr = arrNumbers[i];
     strNext = arrNumbers[i + 1];
-    strOperand = arrOperands[i - 1];
+    strOperator = arrOperators[i - 1];
     floatCurr = parseFloat(strCurr);
-    if (!strOperand) throw new Error(); // This also blocks any processing when = is pressed
+    if (!strOperator) throw new Error(); // This also blocks any processing when = is pressed
     if (!floatPrev || !floatCurr) throw new Error();
     // #6 Compute Result with each iteration
-    if (i <= 1) res = operatePrevCurr(floatPrev, floatCurr, strOperand);
-    else res = operatePrevCurr(STATE.resultCache, floatCurr, strOperand);
+    if (i <= 1) res = operatePrevCurr(floatPrev, floatCurr, strOperator);
+    else res = operatePrevCurr(STATE.resultCache, floatCurr, strOperator);
     // eslint-disable-next-line no-console
-    console.log(i, { floatPrev, res, strCurr, strNext, strOperand, floatCurr });
+    console.log(i, {
+      floatPrev,
+      res,
+      strCurr,
+      strNext,
+      strOperator,
+      floatCurr,
+    });
     // #7 Cache the result to Global DATA.result cache
     if (!res) throw new Error();
     STATE.resultCache = res;
@@ -266,13 +273,13 @@ function compute() {
   const arrDataCopy = arrData; // (7) ['2', '2', '3', '3', '+', '6', '6']
   const strJoinArrData = arrDataCopy.join("").trim();
   const arrNumbers = strJoinArrData
-    .replace(REGEX.regexIsOperands, " ")
+    .replace(REGEX.regexIsOperator, " ")
     .split(" ");
 
   const arrOpe = strJoinArrData.replace(REGEX.regexIsNumber, " ");
+  // eslint-disable-next-line no-console
   console.log({ strJoinArrData, arrOpe });
-  // FIXME Avoid "." from being added to strOperand !!!!!!!!!!!!!!!!! ==>
-  const arrOperands = strJoinArrData
+  const arrOperator = strJoinArrData
     .replace(REGEX.regexIsNumber, " ")
     .split(" ")
     .filter((item) => itemExists(item));
@@ -280,7 +287,7 @@ function compute() {
   console.log("compute", STATE.countCompute, {
     strJoinArrData,
     arrNumbers,
-    arrOperands,
+    arrOperator,
   });
   // #4 Allocate num & operator from arrays to prev & curr & operator
   let strPrev;
@@ -291,10 +298,10 @@ function compute() {
   const floatPrev = parseFloat(strPrev);
   let result = floatPrev;
   // eslint-disable-next-line no-console
-  console.log({ strPrev, floatPrev, result, arrNumbers, arrOperands });
+  console.log({ strPrev, floatPrev, result, arrNumbers, arrOperator });
   // FIXME arrNumbers is the culprit
   // #5 Iterate and get result from array
-  result = computeLoop(arrNumbers, arrOperands, floatPrev, result); // end of for loop
+  result = computeLoop(arrNumbers, arrOperator, floatPrev, result); // end of for loop
   // if (STATE.countCompute === 1) {
   STATE.MAP_DATA.clear();
   STATE.countBtnClick = 1;
