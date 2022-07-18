@@ -87,6 +87,8 @@ const DATA = {
   MAP_NUMBERS: new Map<number, number>(),
   MAP_OPERATOR: new Map<number, string>(),
   MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
+  strPrevCopy: "",
+  result: 0,
 };
 
 const REGEX = {
@@ -234,53 +236,76 @@ function compute() {
   // #1 Flatten Map to Array
   const mappedData = DATA.MAP_DATA;
   const { data, arrData } = flattenDataMapCache(mappedData);
-
   // #2 Convert Array to a string
   const arrDataCopy = arrData; // (7) ['2', '2', '3', '3', '+', '6', '6']
   const strJoinArrData = arrDataCopy.join("").trim(); // '2233+66'
-
   // #3 Group up strings separated by operand
   const regexIsNumber = REGEX.numberDigitOnly;
   const regexIsOperands = REGEX.operandsOnly; // Learn RegEx in 20 minutes --> WebDevSimplified
-
-  const isNumber = regexIsNumber.test(strJoinArrData);
-  const isOperand = regexIsOperands.test(strJoinArrData);
-
+  // const isNumber = regexIsNumber.test(strJoinArrData);
+  // const isOperand = regexIsOperands.test(strJoinArrData);
   const numbersFromString = strJoinArrData.replace(regexIsOperands, " ");
   const operandsFromString = strJoinArrData.replace(regexIsNumber, " ");
-
   const arrNumbers = numbersFromString.split(" ");
   const arrOperands = operandsFromString
     .split(" ")
     .filter((item) => item !== " " && item !== "");
-
   // eslint-disable-next-line no-console
   console.log({ arrNumbers, arrOperands, numbersFromString, operandsFromString, }); // prettier-ignore
 
-  const strPrev = "1";
-  const strCurr = "2";
-  let strOperand = "+";
-
-  let floatPrev;
-  let floatCurr;
-  for (let i = 0; i < arrNumbers.length; i += 1) {
-    if (isNumber) {
-      if (!strPrev || !strCurr) throw new Error();
-      floatPrev = parseFloat(strPrev);
-      floatCurr = parseFloat(strCurr);
-    } else if (isOperand) {
-      if (!strOperand) throw new Error();
-      strOperand = strOperand.trim();
-    }
+  // #4 Allocate num & operator from arrays to prev & curr & operator
+  let strPrev = arrNumbers[0];
+  DATA.strPrevCopy = strPrev; // TODO Remember to reset this value on AC (ALL CLEAR)
+  if (strPrev !== DATA.strPrevCopy) {
+    if (!DATA.result) throw new Error("DATA.result is undefined");
+    strPrev = DATA.result.toString();
   }
-  if (!floatPrev || !floatCurr) throw new Error();
+  // Set first result in array to first number
+  DATA.result = parseFloat(strPrev);
 
-  const result = operatePrevCurr(floatPrev, floatCurr, strOperand);
+  let result;
+  let strCurr;
+  let strOperand;
+  const floatPrev = parseFloat(strPrev);
+  let floatCurr;
+  let strNext;
+  let floatNext;
+
+  // #6 Iterate and get result from array
+  for (let i = 1; i < arrNumbers.length; i += 1) {
+    strCurr = arrNumbers[i];
+    strNext = arrNumbers[i + 1];
+
+    // eslint-disable-next-line no-console
+    console.log({ strPrev, strCurr, strNext });
+
+    if (!strPrev || !strCurr) throw new Error();
+    floatCurr = parseFloat(strCurr);
+    floatNext = parseFloat(strNext);
+
+    strOperand = arrOperands[i - 1];
+    if (!strOperand) throw new Error();
+    // eslint-disable-next-line no-console
+    console.log({ strOperand });
+
+    if (!floatPrev || !floatCurr) throw new Error();
+    if (!floatNext) {
+      result = operatePrevCurr(DATA.result, floatCurr, strOperand);
+    } else {
+      result = operatePrevCurr(DATA.result, floatCurr, strOperand);
+    }
+    if (!result) throw new Error();
+    DATA.result = result;
+  }
+
+  // #5 Cache the result to Global DATA.result cache
 
   // eslint-disable-next-line no-console
-  console.log({ data, arrData, arrDataCopy, strJoinArrData, result });
+  // console.log({ data, arrData, arrDataCopy, strJoinArrData, result });
+  // eslint-disable-next-line no-console
+  console.log({ result });
 
-  return [data, arrData];
+  return [data, arrData, result, arrDataCopy, strJoinArrData];
 }
 
 // ////////////// BTN EVENT LISTEN /////////////
