@@ -83,7 +83,7 @@ const STATE = {
   countOperator: 0,
   markerOperator: 0,
   isBackspace: false,
-  MAP_DATA: new Map<number, string | number>(), // TODO Reset this after calculation result is fetched
+  MAP_DATA: new Map<number, string | number>(),
   MAP_NUMBERS: new Map<number, number>(),
   MAP_OPERATOR: new Map<number, string>(),
   MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
@@ -94,6 +94,7 @@ const STATE = {
   capturedDisplayData: "",
 };
 
+// FIXME REGEX "panics" when numbers have decimals in them ==> strOperand: "."
 const REGEX = {
   regexIsNumber: /([0-9])/gm,
   regexIsOperands: /(-|÷|\+|\*)/gm,
@@ -196,15 +197,13 @@ function flattenDataMapCache(mappedData: Map<number, string | number>) {
 
   return { data, arrData };
 }
+
 function itemExists(item: string): unknown {
-  return item !== " " && item !== "";
+  return item !== " " && item !== "" && item !== ".";
 }
 
 // //// CENTRAL HUB FOR ALL PROCESSING ////
 function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
-  // eslint-disable-next-line no-console
-  console.log("mainHub state-compute", STATE.countCompute);
-
   // #1 Handle & Filter Numbers
   const getValidNumAndOp = handleAllBtn(btn, STATE.countBtnClick);
   if (!getValidNumAndOp) return undefined;
@@ -229,29 +228,22 @@ function computeLoop(
   result: any
 ) {
   let res = result;
-
   // eslint-disable-next-line no-console
   console.log("computeLoop()", { arrNumbers, arrOperands, floatPrev, res });
   let strCurr;
   let floatCurr;
   let strOperand;
   let strNext;
-
   for (let i = 1; i < arrNumbers.length; i += 1) {
     strCurr = arrNumbers[i];
     strNext = arrNumbers[i + 1];
-
     strOperand = arrOperands[i - 1];
     floatCurr = parseFloat(strCurr);
-
     if (!strOperand) throw new Error(); // This also blocks any processing when = is pressed
     if (!floatPrev || !floatCurr) throw new Error();
-
     // #6 Compute Result with each iteration
-    // if (!strNext) // FIXME Enable Or Disable?
     if (i <= 1) res = operatePrevCurr(floatPrev, floatCurr, strOperand);
     else res = operatePrevCurr(STATE.resultCache, floatCurr, strOperand);
-
     // eslint-disable-next-line no-console
     console.log(i, { floatPrev, res, strCurr, strNext, strOperand, floatCurr });
     // #7 Cache the result to Global DATA.result cache
@@ -276,6 +268,10 @@ function compute() {
   const arrNumbers = strJoinArrData
     .replace(REGEX.regexIsOperands, " ")
     .split(" ");
+
+  const arrOpe = strJoinArrData.replace(REGEX.regexIsNumber, " ");
+  console.log({ strJoinArrData, arrOpe });
+  // FIXME Avoid "." from being added to strOperand !!!!!!!!!!!!!!!!! ==>
   const arrOperands = strJoinArrData
     .replace(REGEX.regexIsNumber, " ")
     .split(" ")
