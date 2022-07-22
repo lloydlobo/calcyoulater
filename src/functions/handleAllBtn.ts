@@ -19,18 +19,24 @@ export function handleAllBtn(
   clickCountBtn: number
 ): Map<any, any> | undefined {
   let getVal;
+  let val;
   if (ev.type === "submit") {
     getVal = (ev as HTMLButtonElement).value;
+    val = getVal;
   } else {
     getVal = (ev as KeyboardEvent).key;
+    val = queryKeyboardRegex(getVal);
   }
-  const val = queryKeyboardRegex(getVal);
   // const filterVal = handleKeyboardRegex(isValidVal);
 
-  if (!val) throw new Error();
+  if (typeof val === "undefined") {
+    throw new Error("Invalid value provided");
+  }
   const count = clickCountBtn;
+
   if (prevValIsAlsoOperator(val, count)) return undefined;
   if (prevValIsAlsoPeriod(val, count)) return undefined;
+
   const currVal = STATE.MAP_VALUES_HANDLE.set(count, val);
 
   return currVal;
