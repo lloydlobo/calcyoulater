@@ -7,8 +7,6 @@ A calculator app for The Odin Project
 
 <!-- [![image](https://user-images.githubusercontent.com/76430758/178101591-eaaed8c7-afd1-4624-ae08-b2833867c33f.png)](https://calcyoulater.vercel.app/) -->
 
-
-
 ## References
 
 <https://mathworld.wolfram.com/Precedence.html>
