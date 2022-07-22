@@ -1,9 +1,5 @@
-/* eslint-disable import/extensions */
-/* eslint-disable import/no-unresolved */
-/* eslint-disable import/prefer-default-export */
-// eslint-disable-next-line import/no-unresolved, import/extensions
-
-import { operatorIsClicked, outputDisplay } from "../main";
+import { outputDisplay } from "../main";
+import { operatorIsClicked } from "../utils/operatorIsClicked";
 
 export function displayPersist(val: string | number) {
   // console.log({ val });
