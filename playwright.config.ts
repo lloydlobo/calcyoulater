@@ -1,4 +1,5 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { devices } from "@playwright/test";
 
 /**
@@ -104,4 +105,5 @@ const config: PlaywrightTestConfig = {
   // },
 };
 
+// eslint-disable-next-line import/no-default-export
 export default config;

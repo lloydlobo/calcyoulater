@@ -61,6 +61,7 @@ export const STATE = {
   countMainHub: 0,
   countOperator: 0,
   isBackspace: false,
+  isComputed: false,
   MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
   MAP_DATA: new Map<number, string | number>(),
   MAP_FILTER_NUM: new Map(),
@@ -151,6 +152,7 @@ function calculateBtnListener() {
     // & mainHubNumOp state setting of MAP_DATA is reset
     STATE.countCompute += 1;
     const result = compute();
+    STATE.isComputed = true;
     // eslint-disable-next-line no-console
     console.log({ result });
     // if (!result) throw new Error("result not found");
