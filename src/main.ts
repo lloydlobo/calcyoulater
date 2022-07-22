@@ -203,7 +203,7 @@ function eraseAllData() {
   STATE.resultCache = 0;
   STATE.strPrevCopy = "";
   outputDisplay.innerText = "0";
-  inputHistory.innerText = "Ans = 0";
+  inputHistory.innerText = "";
 }
 
 btnAllClear.addEventListener("click", () => {
