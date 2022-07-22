@@ -27,6 +27,7 @@ export const d3Array: any[] = [];
 
 // ////////////////CONSTANTS/////////
 const btnAll: HTMLButtonElement[] = Array.from(document.getElementsByTagName("button")); // prettier-ignore
+const btnAllClear = document.getElementById("btnAllClear") as HTMLButtonElement;
 const MAP_BTN_CACHE = new Map();
 
 for (let i = 0; i < btnAll.length; i += 1) MAP_BTN_CACHE.set(i, btnAll[i]);
@@ -178,3 +179,33 @@ function main() {
 main();
 
 // //// END OF SCRIPT ////
+
+function eraseAllData() {
+  STATE.capturedDisplayData = "";
+  STATE.countBtnClick = 0;
+  STATE.countCompute = 0;
+  STATE.countFilterNumbers = 0;
+  STATE.countFilterOperators = 0;
+  STATE.countMainHub = 0;
+  STATE.countOperator = 0;
+  STATE.isBackspace = false;
+  STATE.isComputed = false;
+  STATE.MAP_BTN_UTIL_CACHE = new Map(); // AC; C, ..
+  STATE.MAP_DATA = new Map<number, string | number>();
+  STATE.MAP_FILTER_NUM = new Map();
+  STATE.MAP_FILTER_OP = new Map();
+  STATE.MAP_NUMBERS = new Map<number, number>();
+  STATE.MAP_OPERATOR = new Map<number, string>();
+  STATE.MAP_VALUES_HANDLE = new Map();
+  STATE.markerOperator = 0;
+  STATE.reqToCalculate = false;
+  STATE.result = 0;
+  STATE.resultCache = 0;
+  STATE.strPrevCopy = "";
+  outputDisplay.innerText = "0";
+  inputHistory.innerText = "Ans = 0";
+}
+
+btnAllClear.addEventListener("click", () => {
+  eraseAllData();
+});
