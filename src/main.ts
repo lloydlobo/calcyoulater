@@ -116,9 +116,13 @@ function handleGlobalState(
 }
 
 // //// CENTRAL HUB FOR ALL PROCESSING ////
-function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
+function mainHubNumOp(
+  ev: HTMLButtonElement | KeyboardEvent
+): (string | number)[] | undefined {
+  // eslint-disable-next-line no-console
+  console.log(ev.type);
   // #1 Handle & Filter Numbers
-  const getValidNumAndOp = handleAllBtn(btn, STATE.countBtnClick);
+  const getValidNumAndOp = handleAllBtn(ev, STATE.countBtnClick);
   if (!getValidNumAndOp) return undefined;
   const arrayNumAndOperator = filterBtnInputs(getValidNumAndOp);
   if (!arrayNumAndOperator) return undefined;
@@ -208,4 +212,12 @@ function eraseAllData() {
 
 btnAllClear.addEventListener("click", () => {
   eraseAllData();
+});
+
+window.addEventListener("keydown", (event: KeyboardEvent) => {
+  // eslint-disable-next-line no-console
+  console.log(typeof event);
+  const currNumOp = mainHubNumOp(event); // MAIN ENTRYPOINT
+  if (!currNumOp) throw new Error("Cannot find mainHubNumOp() result");
+  updateDisplay(currNumOp); // DOM UI CLIENT STUFF
 });
