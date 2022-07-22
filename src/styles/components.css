@@ -55,7 +55,9 @@ body::-webkit-scrollbar-thumb {
 
 #output {
   font-family: var(--font-mono-noto);
+  word-wrap: break-word;
 }
+
 #btnOperators {
   font-size: large;
 }

@@ -1,9 +1,16 @@
-/* eslint-disable import/no-unresolved */ /* eslint-disable import/extensions */ /* eslint-disable no-console */
-
 import "./style.css";
+import { drawData as drawD3Data } from "./charts/drawData";
 import { drawLineOnCanvas, fillBlankOnCanvas } from "./canvas/canvas";
-import { drawData } from "./charts/drawData";
-// import { operatorArith } from "./logic/calculator";
+import { compute } from "./logic/compute";
+import { displayResult } from "./ui/displayResult";
+import { displayHistory } from "./ui/displayHistory";
+import { isNumAndOperator } from "./functions/isNumAndOperator";
+import { updateDisplay } from "./ui/updateDisplay";
+import { handleAllBtn } from "./functions/handleAllBtn";
+import { filterBtnInputs } from "./functions/filterBtnInputs";
+import { handleMapStateIfNumOrOperator } from "./handleMapStateIfNumOrOperator";
+import { handleCountStateNumOperator } from "./handleCountStateNumOperator";
+import { resetDisplayZeroToFirstNumberInput } from "./ui/resetDisplayZeroToFirstNumberInput";
 
 // /////////////////////////APP///////
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -13,51 +20,28 @@ appClass.toLowerCase();
 // ///////////////////////CHARTS D3///
 const d3Article = document.getElementById("d3");
 export const d3Label = document.getElementById("d3Label") as HTMLLabelElement;
-export const btnD3Category = document.getElementById(
-  "btnD3Category"
-) as HTMLButtonElement;
+export const btnD3Category = document.getElementById("btnD3Category") as HTMLButtonElement; // prettier-ignore
+
 if (!d3Article) throw new Error("d3 not found");
 export const d3Array: any[] = [];
-// D3 DATA RENDERING !!!!
-drawData();
 
 // ////////////////CONSTANTS/////////
-export const outputDisplay = document.querySelector( "#output") as HTMLOutputElement; // prettier-ignore
-const btnAll = document.getElementsByTagName("button") as any;
-const btnClear = document.getElementById("btnClear") as HTMLButtonElement;
-const btnAllClear = document.getElementById("btnAllClear") as HTMLButtonElement;
+const btnAll: HTMLButtonElement[] = Array.from(document.getElementsByTagName("button")); // prettier-ignore
+const MAP_BTN_CACHE = new Map();
 
-const btnGetHistory = document.getElementById(
-  "btnHistory"
-) as HTMLButtonElement;
+for (let i = 0; i < btnAll.length; i += 1) MAP_BTN_CACHE.set(i, btnAll[i]);
 
-const btnClearArray = [btnClear, btnAllClear];
-const btnDecimal = document.getElementById("btnDecimal") as HTMLButtonElement;
-
-const btnCalculate = document.getElementById(
-  "btnResultEquals"
-) as HTMLButtonElement;
-
+export const outputDisplay = document.querySelector("#output") as HTMLOutputElement; // prettier-ignore
 export const inputHistory = document.querySelector("#inputHistory") as any;
-let cacheDigitsArray: (string | number)[] = [];
-let cacheOperatorsArray: string[] = [];
-
-// MUTABLE VARIABLES
-const allBtn: HTMLButtonElement[] = [];
-// Spread btnAll to access forEach method
-const allButtons = [...btnAll];
-allButtons.forEach((btn) => {
-  allBtn.push(btn);
-});
-
-// disableNumbers(); // disableOperators(); // disableEquals(); // disableAll(); // disableMemory(); // disableClear(); // disablePlusMinus();
+export const btnDecimal = document.getElementById("btnDecimal") as HTMLButtonElement; // prettier-ignore
+const btnCalculate = document.getElementById("btnResultEquals") as HTMLButtonElement; // prettier-ignore
 
 // ////////////////CANVAS////////////
-// GET TEXT From User Input in DOM Display
 const outputVal = outputDisplay.textContent;
 if (!outputVal) throw new Error("outputVal is not defined");
 export const output = parseInt(outputVal, 10); // animate canvas with a variable
 
+// ////////////////DRAW CANVAS//////////
 // Animate the canvas at intervals
 const animateCanvas = (
   drawTime: number | undefined,
@@ -67,350 +51,128 @@ const animateCanvas = (
   setInterval(fillBlankOnCanvas, blankTime);
 };
 
-// ////////////////DRAW CANVAS//////////
-function drawCanvas() {
-  animateCanvas(1000, 1000);
-}
-drawCanvas();
+// //////////////// GLOBAL VARIABLES ///////////////
+export const STATE = {
+  capturedDisplayData: "",
+  countBtnClick: 0,
+  countCompute: 0,
+  countFilterNumbers: 0,
+  countFilterOperators: 0,
+  countMainHub: 0,
+  countOperator: 0,
+  isBackspace: false,
+  MAP_BTN_UTIL_CACHE: new Map(), // AC, C, ..
+  MAP_DATA: new Map<number, string | number>(),
+  MAP_FILTER_NUM: new Map(),
+  MAP_FILTER_OP: new Map(),
+  MAP_NUMBERS: new Map<number, number>(),
+  MAP_OPERATOR: new Map<number, string>(),
+  MAP_VALUES_HANDLE: new Map(),
+  markerOperator: 0,
+  reqToCalculate: false,
+  result: 0,
+  resultCache: 0,
+  strPrevCopy: "",
+};
 
-// ////////////////DOM DISPLAY INPUT/////
-function operatorIsClicked(val: string) {
-  return val === "-" || val === "+" || val === "*" || val === "÷";
-}
+export const REGEX = {
+  regexIsNumber: /([0-9])/gm,
+  regexIsOperator: /(-|÷|\+|\*)/gm,
+  regexIsOperatorPositiveLookbehind: /.(?<=(-|÷|\*|\+))/, // gets all the operators groups
+};
 
-function displayPersist(val: string | number) {
-  console.log({ val });
-  if (operatorIsClicked(val as string)) {
-    if (typeof val === "string") {
-      outputDisplay.textContent = outputDisplay.textContent!.concat(val);
+function handleGlobalState(
+  getValidNumAndOp: Map<any, any>,
+  arrayNumAndOperator: (string | number)[]
+) {
+  const res = handleMapStateIfNumOrOperator(getValidNumAndOp);
+  const key = res[0];
+  const data = res[1];
+  const isTrueIfOperator = res[2];
+
+  // eslint-disable-next-line no-console
+  console.log(res);
+  // #1 Set DATA
+  if (typeof isTrueIfOperator === "boolean" && typeof key === "number") {
+    if (isTrueIfOperator) {
+      STATE.MAP_FILTER_OP.set(key, data);
+    } else {
+      STATE.MAP_FILTER_NUM.set(key, data);
     }
+  }
+  // #2 Update count for num & op & each btn count
+  if (handleCountStateNumOperator(arrayNumAndOperator)) {
+    STATE.countFilterOperators += 1;
   } else {
-    if (
-      outputDisplay.textContent === "0" &&
-      outputDisplay.textContent.length === 1
-    ) {
-      outputDisplay.textContent = "";
-    }
-    outputDisplay.textContent = outputDisplay.textContent!.concat(
-      val.toLocaleString()
-    );
+    STATE.countFilterNumbers += 1;
   }
+  STATE.countBtnClick += 1; // Increment count
+  // #3 Populate Numbers & Operators in Cache
+  STATE.MAP_DATA.set(STATE.countBtnClick, arrayNumAndOperator[1]);
+  // eslint-disable-next-line no-console
+  console.log(STATE);
 }
 
-// ///////////////////////SETUP//////////
+// //// CENTRAL HUB FOR ALL PROCESSING ////
+function mainHubNumOp(btn: HTMLButtonElement): (string | number)[] | undefined {
+  // #1 Handle & Filter Numbers
+  const getValidNumAndOp = handleAllBtn(btn, STATE.countBtnClick);
+  if (!getValidNumAndOp) return undefined;
+  const arrayNumAndOperator = filterBtnInputs(getValidNumAndOp);
+  if (!arrayNumAndOperator) return undefined;
+  handleGlobalState(getValidNumAndOp, arrayNumAndOperator);
 
-let inputCount = 0;
-// let inputCountLast = 0;
-let operatorCount = 0;
-
-let valString = "";
-// START OF GLOBAL VARIABLES
-let x: number | null = null;
-let y: number | null = null;
-let nextNumber: number | null = null;
-let operator: string | null = null;
-let data = 0;
-let inputArray: string[] = [];
-let resultInputArray: string[] = [];
-let isReset: boolean;
-let valMap = new Map();
-function equalsIsClicked(val: string) {
-  if (val !== "=") return false;
-  return true;
+  return arrayNumAndOperator;
 }
 
-function resetValues(a: number | null, b: number | null, z: string | null) {
-  x = a;
-  y = b;
-  operator = z;
-
-  x = null;
-  y = null;
-  operator = null;
-
-  // return [x, y, operator];
-  return true;
-}
-
-let toggle = true;
-
-function clickDecimalOnce() {
-  if (toggle) {
-    btnDecimal.disabled = true;
-  } else {
-    btnDecimal.disabled = false;
-  }
-  toggle = !toggle;
-}
-btnDecimal.removeEventListener("click", clickDecimalOnce, false);
-
-// allow decimal to be pressed only once
-btnDecimal.addEventListener("click", () => {
-  clickDecimalOnce();
-});
-
-const numMap = new Map();
-
-allBtn.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    const val = btn.value;
-
-    if (isReset) {
-      x = null;
-      y = null;
-      isReset = false;
-    }
-
-    if (!equalsIsClicked(val)) {
-      valString = valString.concat(val);
-      valMap.set(operatorCount, valString);
-      console.log({ valMap });
-      console.log(valString);
-    }
-    console.log({ inputArray });
-    if (operatorIsClicked(val)) {
-      operatorCount += 1; // switch off x_concat as it now takes result
-      console.log({ operatorCount });
-      operator = val;
-      displayPersist(operator);
-      cacheOperatorsArray.push(operator);
-      cacheDigitsArray.push(operator); // FIXME maybe make it a json object with titles
-    }
-    if (val === "=") return;
-    data = parseFloat(val);
-
-    if (inputCount > 0) {
-      x = parseFloat(valString.trim());
-    }
-
-    if (!x || x.toString().length < 1) {
-      x = parseFloat(val.trim());
-      displayPersist(val);
-      cacheDigitsArray.push(x);
-    } else if (
-      x.toString().length >= 1 &&
-      !operatorIsClicked(val) &&
-      operatorCount === 0
-    ) {
-      x = parseFloat(x.toString().concat(val));
-      cacheDigitsArray.push(x);
-      console.log({ x_concat: x });
-      displayPersist(val);
-    }
-    numMap.set(inputCount, x);
-    console.log({ numMap_x: numMap });
-    // const currentOperatorCount = operatorCount + 1;
-    if (operatorCount > 0 && !operatorIsClicked(val)) {
-      if (!y || y.toString().length < 1) {
-        y = parseFloat(val);
-        cacheDigitsArray.push(y);
-        nextNumber = y;
-        numMap.set(operatorCount, y);
-        displayPersist(val);
-      } else if (y.toString().length >= 1) {
-        if (!nextNumber) {
-          throw new Error("Number must be defined");
-        }
-        // y = parseFloat(y.toString().concat(val));
-        console.log({ nextNumber });
-        y = parseFloat(nextNumber.toString().concat(val)); // FIXME splice val from nextNumber
-        numMap.set(operatorCount, y);
-
-        displayPersist(val);
-        cacheDigitsArray.push(y);
-      }
-    }
-    // numMap.set(inputCount, y);
-    console.log({ numMap });
-    console.log({ cacheDigitsArray });
-    console.log({ x, y, operator });
-  });
-});
-
-if (data === undefined) throw new Error("Invalid data");
-
-/**
- * 1. Need 3 arrays to capture number, operator, and result
- * 2. the numbers one can be a json object too?
- *
- */
-
-// ////////////////LOGIC///////////////
-function operateSwitch(
-  l: number,
-  m: number,
-  operatorType: string
-): number | null {
-  let result = null;
-  if (operatorType === "÷") {
-    result = l / m;
-  }
-  if (operatorType === "*") {
-    result = l * m;
-  }
-  if (operatorType === "+") {
-    result = l + m;
-  }
-  if (operatorType === "-") {
-    result = l - m;
-  }
-  isReset = resetValues(x, y, operator);
-  return result;
-}
-
-let savedCurrentOperateHistory = "";
-let countResultsForHistory = 0;
-
-function isOperator(item: any): boolean {
-  return item === "+" || item === "-" || item === "*" || item === "÷";
-}
-function isANumberOnly(item: any): boolean {
-  return (
-    typeof parseFloat(item) === "number" && !isOperator(item) && item !== ""
-  );
-}
-const numItemMap = new Map();
-const operaItemMap = new Map();
-
-function operatePrevCurr(a: number, b: number, op: string): number {
-  let res = 0;
-  if (a && b === 0 && op === "÷") return res; // a/b or 1/0 is reserved
-  if (op === "÷") res = a / b;
-  if (op === "*") res = a * b;
-  if (op === "+") res = a + b;
-  if (op === "-") res = a - b;
-  console.log({ a, op, b, res });
-  return res * 1;
-}
-
-let prev: number;
-let curr: number;
-let next: number;
-let currOp: string;
-function operateMap() {
-  const dataMap = valMap;
-  const lastData = dataMap.get(operatorCount);
-  const regExpNumAndOperator = /(\d*\.\d+|\d+\.\d*|\d+)/gm;
-  const dataArr = lastData.split(regExpNumAndOperator);
-
-  for (let i = 1; i < dataArr.length - 1; i += 1) {
-    const item = dataArr[i];
-
-    if (isANumberOnly(item)) {
-      numItemMap.set(i, item);
-    }
-    if (isOperator(item)) {
-      operaItemMap.set(i, item);
+// ////////////// BTN EVENT LISTEN /////////////
+function addEventListenersToBtn() {
+  for (let i = 0; i < MAP_BTN_CACHE.size; i += 1) {
+    const currBtn = MAP_BTN_CACHE.get(i);
+    if (isNumAndOperator(currBtn) || currBtn.value === ".") {
+      MAP_BTN_CACHE.get(i).addEventListener("click", () => {
+        const clickedBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
+        const currNumOp = mainHubNumOp(clickedBtn); // MAIN ENTRYPOINT
+        if (!currNumOp) throw new Error("Cannot find mainHubNumOp() result");
+        resetDisplayZeroToFirstNumberInput();
+        updateDisplay(currNumOp); // DOM UI CLIENT STUFF
+      }); // end of event listener
+    } else {
+      const clickedUtilBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
+      STATE.MAP_BTN_UTIL_CACHE.set(i, clickedUtilBtn);
     }
   } // end of for loop
-
-  for (let i = 1; i <= numItemMap.size * 2 - 3; i += 2) {
-    const nextIndexIsEven = (i + 1) % 2 === 0;
-    if (nextIndexIsEven) {
-      currOp = operaItemMap.get(i + 1) as string;
-    }
-    const currIndexIsEven = i % 2 === 0;
-    if (!currIndexIsEven && i <= numItemMap.size * 2 - 1) {
-      if (i === 1) {
-        prev = parseFloat(numItemMap.get(i));
-        curr = parseFloat(numItemMap.get(i + 2));
-        next = operatePrevCurr(prev, curr, currOp as string) as number;
-      }
-      if (i > 1) {
-        if (!next || next.toString().length < 1) {
-          throw new Error("Next: Invalid number");
-        }
-        prev = next;
-        curr = parseFloat(numItemMap.get(i + 2));
-        next = operatePrevCurr(prev, curr, currOp as string) as number;
-      }
-    }
-  }
-  outputDisplay.textContent = "";
-  console.log(next);
-  if (!next) throw new Error("next number not found ");
-  outputDisplay.textContent = next!.toFixed(2).toString();
-  return next as number;
-}
-
-function operate() {
-  operateMap();
-  valString = "";
-  valMap = new Map();
-  inputArray.push(valString);
-  if (!x || !y || !operator) throw new Error("Invalid data");
-  let result = operateSwitch(x, y, operator);
-  if (!result) result = 0;
 }
 
 // Calculate result when "=" is entered/clicked
-btnCalculate.addEventListener("click", operate);
+function calculateBtnListener() {
+  btnCalculate.addEventListener("click", () => {
+    // #6 RESET STATE so prev mappedData is reset
+    // & mainHubNumOp state setting of MAP_DATA is reset
+    STATE.countCompute += 1;
+    const result = compute();
+    // eslint-disable-next-line no-console
+    console.log({ result });
+    // if (!result) throw new Error("result not found");
 
-// ////////////////END///////////////
+    STATE.resultCache = result; // #8 Increment DATA compute counter - fetch the prev val from array then
 
-function disableHideHistoryButton() {
-  if (inputArray.length === 0) {
-    console.log("disabled");
-    btnGetHistory.disabled = true;
-    btnGetHistory.style.opacity = "0";
-  }
+    displayResult();
+
+    displayHistory();
+  });
 }
 
-let inputOutputArray: string[] = [];
+function main() {
+  drawD3Data(); // D3 DATA RENDERING !!!!
 
-btnClearArray.forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    if (btn.value === "AC") {
-      inputArray = [];
-      resultInputArray = [];
-      countResultsForHistory = 0;
-      savedCurrentOperateHistory = "";
-      inputOutputArray = [];
-      cacheOperatorsArray = [];
-      cacheDigitsArray = [];
-      disableHideHistoryButton();
-      console.clear();
-    }
-    // AC & C common functionality
-    outputDisplay.textContent = "0";
-    inputHistory.textContent = "Ans = 0";
-    inputCount = 0;
-    operatorCount = 0;
-    valString = "";
-    data = 0;
-    resetValues(x, y, operator);
-  });
-});
+  animateCanvas(1000, 1000);
 
-disableHideHistoryButton();
+  addEventListenersToBtn();
 
-// HISTORY
+  calculateBtnListener();
+}
 
-let toggled = false;
-btnGetHistory.addEventListener("click", () => {
-  if (!toggled) {
-    toggled = true;
-  } else {
-    toggled = false;
-  }
-  if (
-    inputArray.length > 0 &&
-    countResultsForHistory < resultInputArray.length
-  ) {
-    const saveHistoryResult = resultInputArray.join(" ");
-    console.log({ saveHistoryResult });
-    let inputOutput = "";
-    for (let i = countResultsForHistory; i < resultInputArray.length; i += 1) {
-      inputOutput = ` ${inputArray[i]} = ${resultInputArray[i]} `;
-      inputOutputArray.push(inputOutput);
-    }
-    countResultsForHistory = resultInputArray.length;
-  }
-  if (toggled) {
-    inputHistory.textContent = inputOutputArray;
-    toggled = true;
-  } else {
-    inputHistory.textContent = savedCurrentOperateHistory;
-    toggled = false;
-  }
-});
+main();
+
+// //// END OF SCRIPT ////
