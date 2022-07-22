@@ -21,10 +21,11 @@ export function compute() {
   let result = floatPrev;
   // #5 Iterate and get result from array
   result = computeLoop(arrNumbers, arrOperator, floatPrev, result); // end of for loop
+
   STATE.MAP_DATA.clear();
   STATE.countBtnClick = 1;
   STATE.MAP_DATA.set(1, result);
-  if (!result) throw new Error();
+  // if (!result) throw new Error();
 
   return result;
 }

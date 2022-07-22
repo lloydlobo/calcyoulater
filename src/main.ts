@@ -10,6 +10,7 @@ import { handleAllBtn } from "./functions/handleAllBtn";
 import { filterBtnInputs } from "./functions/filterBtnInputs";
 import { handleMapStateIfNumOrOperator } from "./handleMapStateIfNumOrOperator";
 import { handleCountStateNumOperator } from "./handleCountStateNumOperator";
+import { resetDisplayZeroToFirstNumberInput } from "./ui/resetDisplayZeroToFirstNumberInput";
 
 // /////////////////////////APP///////
 const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -88,6 +89,9 @@ function handleGlobalState(
   const key = res[0];
   const data = res[1];
   const isTrueIfOperator = res[2];
+
+  // eslint-disable-next-line no-console
+  console.log(res);
   // #1 Set DATA
   if (typeof isTrueIfOperator === "boolean" && typeof key === "number") {
     if (isTrueIfOperator) {
@@ -105,6 +109,8 @@ function handleGlobalState(
   STATE.countBtnClick += 1; // Increment count
   // #3 Populate Numbers & Operators in Cache
   STATE.MAP_DATA.set(STATE.countBtnClick, arrayNumAndOperator[1]);
+  // eslint-disable-next-line no-console
+  console.log(STATE);
 }
 
 // //// CENTRAL HUB FOR ALL PROCESSING ////
@@ -128,7 +134,7 @@ function addEventListenersToBtn() {
         const clickedBtn: HTMLButtonElement = MAP_BTN_CACHE.get(i);
         const currNumOp = mainHubNumOp(clickedBtn); // MAIN ENTRYPOINT
         if (!currNumOp) throw new Error("Cannot find mainHubNumOp() result");
-
+        resetDisplayZeroToFirstNumberInput();
         updateDisplay(currNumOp); // DOM UI CLIENT STUFF
       }); // end of event listener
     } else {
@@ -144,9 +150,10 @@ function calculateBtnListener() {
     // #6 RESET STATE so prev mappedData is reset
     // & mainHubNumOp state setting of MAP_DATA is reset
     STATE.countCompute += 1;
-
     const result = compute();
-    if (!result) throw new Error("result not found");
+    // eslint-disable-next-line no-console
+    console.log({ result });
+    // if (!result) throw new Error("result not found");
 
     STATE.resultCache = result; // #8 Increment DATA compute counter - fetch the prev val from array then
 
