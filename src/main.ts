@@ -150,33 +150,28 @@ function addEventListenersToBtn() {
   } // end of for loop
 }
 
+function calculateWhenCalled() {
+  // #6 RESET STATE so prev mappedData is reset
+  STATE.countCompute += 1;
+  const result = compute();
+  STATE.isComputed = true;
+  // & mainHubNumOp state setting of MAP_DATA is reset
+  STATE.resultCache = result; // #8 Increment DATA compute counter - fetch the prev val from array then
+  displayResult();
+  displayHistory();
+}
+
 // Calculate result when "=" is entered/clicked
 function calculateBtnListener() {
   btnCalculate.addEventListener("click", () => {
-    // #6 RESET STATE so prev mappedData is reset
-    // & mainHubNumOp state setting of MAP_DATA is reset
-    STATE.countCompute += 1;
-    const result = compute();
-    STATE.isComputed = true;
-    // eslint-disable-next-line no-console
-    console.log({ result });
-    // if (!result) throw new Error("result not found");
-
-    STATE.resultCache = result; // #8 Increment DATA compute counter - fetch the prev val from array then
-
-    displayResult();
-
-    displayHistory();
+    calculateWhenCalled();
   });
 }
 
 function main() {
   drawD3Data(); // D3 DATA RENDERING !!!!
-
   animateCanvas(1000, 1000);
-
   addEventListenersToBtn();
-
   calculateBtnListener();
 }
 
@@ -215,9 +210,13 @@ btnAllClear.addEventListener("click", () => {
 });
 
 window.addEventListener("keydown", (event: KeyboardEvent) => {
-  // eslint-disable-next-line no-console
-  console.log(typeof event);
   const currNumOp = mainHubNumOp(event); // MAIN ENTRYPOINT
   if (!currNumOp) throw new Error("Cannot find mainHubNumOp() result");
   updateDisplay(currNumOp); // DOM UI CLIENT STUFF
+});
+
+window.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    calculateWhenCalled();
+  }
 });
